@@ -7,4 +7,6 @@ export interface ScoreData {
   coins: number;
   highScore: number;
   elapsedSeconds: number;
+  bestTimeSeconds: number | null; // 타임어택 최고 기록 (초)
 }
+

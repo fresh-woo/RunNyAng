@@ -91,9 +91,15 @@ export const drawPlayer = (
   ctx.stroke();
 
   // Small frame indicator badge (helpful for planner & designer verification)
-  ctx.fillStyle = '#38bdf8';
-  ctx.font = 'bold 10px monospace';
-  ctx.fillText(`F${currentFrame + 1}`, x + width / 2 - 8, screenY + 6);
+  if (player.stunTimerMs > 0) {
+    ctx.fillStyle = '#ef4444';
+    ctx.font = 'bold 11px sans-serif';
+    ctx.fillText('⚡경직!', x + width / 2 - 12, screenY - 2);
+  } else {
+    ctx.fillStyle = '#38bdf8';
+    ctx.font = 'bold 10px monospace';
+    ctx.fillText(`F${currentFrame + 1}`, x + width / 2 - 8, screenY + 6);
+  }
 
   ctx.restore();
 };
