@@ -67,30 +67,41 @@ npm run build
 
 ---
 
-## 📁 프로젝트 디렉토리 구조 (Directory Structure)
+## 📁 프로젝트 디렉토리 구조 (Light FSD Architecture)
+
+유지보수, 테스트 및 컴포넌트 재사용성을 극대화하기 위해 **Light FSD (Feature-Sliced Design)** 구조를 채택했습니다.
 
 ```
 RunNyAng/
-├── .github/
-│   ├── ISSUE_TEMPLATE/        # 이슈 템플릿 (기능 제안, 버그 리포트)
-│   └── pull_request_template.md # PR 템플릿
-├── docs/
-│   ├── GDD.md                 # 세부 게임 기획서 (Game Design Document)
-│   └── CONVENTIONS.md         # Git 브랜치, 커밋 메시지, PR 협업 규칙
-├── public/                    # 정적 파일 (파비콘, 기본 사운드 에셋 등)
+├── .github/                       # GitHub 이슈 및 PR 템플릿
+├── docs/                          # 기획서(GDD) 및 팀 협업 컨벤션
+├── public/                        # 정적 파일 (파비콘, 기본 사운드 에셋)
 ├── src/
-│   ├── assets/                # 이미지, 스프라이트, 오디오 에셋
-│   ├── components/            # UI 컴포넌트 (HUD, 모달, 버튼 등)
-│   ├── game/                  # 캔버스 렌더러, 물리 엔진, 게임 루프 로직
-│   ├── hooks/                 # 커스텀 훅 (키보드/터치 입력, 리사이즈 등)
-│   ├── types/                 # 타입 정의 (GameState, Player, Obstacle 등)
-│   ├── App.css                # 반응형 캔버스 및 오버레이 스타일
-│   ├── App.tsx                # 메인 게임 컨테이너 & 프로토타입 루프
-│   ├── index.css              # 모바일 웹앱 터치/스크롤 방지 글로벌 CSS
-│   └── main.tsx               # 엔트리 포인트
-├── index.html                 # 뷰포트 메타태그 및 웹앱 설정
+│   ├── app/                       # 1. 앱 진입점 및 전역 스타일
+│   │   ├── styles/index.css       # 모바일 웹앱 터치/스크롤 방지 글로벌 CSS
+│   │   └── App.tsx                # 최상위 앱 레이아웃
+│   ├── pages/                     # 2. 페이지 단위 화면 조합
+│   │   └── game-page/             # 메인 인게임 페이지 (HUD, Canvas, Modal 조립)
+│   ├── widgets/                   # 3. 독립적이고 완성도 높은 복합 UI 블록
+│   │   ├── game-canvas/           # 캔버스 뷰포트 위젯
+│   │   ├── hud/                   # 거리, 코인, 최고기록 표시 HUD
+│   │   ├── ready-overlay/         # 게임 시작 전 타이틀 오버레이
+│   │   └── game-over-modal/       # 게임 오버 결과 모달
+│   ├── features/                  # 4. 사용자 인터랙션 & 게임 구동 로직
+│   │   ├── controls/              # 키보드 / 모바일 터치 조작 훅 (useGameControls)
+│   │   └── game-engine/           # 게임 루프 & 런타임 상태 관리 훅 (useGameEngine)
+│   ├── entities/                  # 5. 핵심 게임 도메인 모델 (물리, 충돌, 렌더링)
+│   │   ├── player/                # 플레이어 모델, 점프/슬라이딩 물리, 렌더러
+│   │   ├── obstacle/              # 장애물 모델, 스폰 및 AABB 충돌 로직, 렌더러
+│   │   └── coin/                  # 코인 모델, 스폰 및 수집 충돌 판정, 렌더러
+│   ├── shared/                    # 6. 공통 유틸, 상수 및 기본 UI 컴포넌트
+│   │   ├── config/                # 게임 물리/속도/캔버스 설정 상수 (gameConfig.ts)
+│   │   ├── types/                 # 공통 상태 및 스코어 인터페이스
+│   │   └── ui/                    # Button, Overlay 등 원자 단위 공통 UI
+│   ├── main.tsx                   # 애플리케이션 마운트 엔트리
+│   └── vite-env.d.ts
+├── index.html                     # 뷰포트 메타태그 및 반응형 웹앱 설정
 ├── package.json
-├── tsconfig.json
 └── vite.config.ts
 ```
 
