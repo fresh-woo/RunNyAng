@@ -1,42 +1,55 @@
-import { GRAVITY, GROUND_Y, JUMP_FORCE, PLAYER_INITIAL_CONFIG } from '../../../shared/config/gameConfig';
+import {
+  BASE_FORWARD_SPEED,
+  LATERAL_SPEED,
+  ROAD_LEFT,
+  ROAD_RIGHT,
+  STAGE_LENGTH,
+  PLAYER_CONFIG,
+} from '../../../shared/config/gameConfig';
 import { Player } from './types';
 
-export const updatePlayerPhysics = (player: Player): void => {
-  player.y += player.velocityY;
-  player.velocityY += GRAVITY;
+export interface MovementInput {
+  moveLeft: boolean;
+  moveRight: boolean;
+  moveUp: boolean;
+  moveDown: boolean;
+}
 
-  const groundLevel = GROUND_Y - player.height;
-  if (player.y >= groundLevel) {
-    player.y = groundLevel;
-    player.velocityY = 0;
-    player.isJumping = false;
-    player.jumpCount = 0;
+export const updatePlayerMovement = (
+  player: Player,
+  input: MovementInput,
+  deltaTimeMs: number
+): void => {
+  // Lateral movement (Left / Right)
+  if (input.moveLeft) {
+    player.x -= LATERAL_SPEED;
+    player.facing = 'LEFT';
+  } else if (input.moveRight) {
+    player.x += LATERAL_SPEED;
+    player.facing = 'RIGHT';
+  } else {
+    player.facing = 'UP';
   }
-};
 
-export const jumpPlayer = (player: Player): boolean => {
-  if (player.jumpCount < PLAYER_INITIAL_CONFIG.maxJumpCount) {
-    player.velocityY = JUMP_FORCE;
-    player.isJumping = true;
-    player.jumpCount += 1;
-    player.isSliding = false;
-    player.height = PLAYER_INITIAL_CONFIG.height;
-    return true;
+  // Clamping X within campus road bounds
+  const minX = ROAD_LEFT + 10;
+  const maxX = ROAD_RIGHT - player.width - 10;
+  player.x = Math.max(minX, Math.min(maxX, player.x));
+
+  // Forward running (Automatic forward progression + Up boost / Down brake)
+  let currentSpeed = BASE_FORWARD_SPEED;
+  if (input.moveUp) currentSpeed += 2.5;
+  if (input.moveDown) currentSpeed = Math.max(1.5, currentSpeed - 2.5);
+
+  player.worldY += currentSpeed;
+  if (player.worldY > STAGE_LENGTH) {
+    player.worldY = STAGE_LENGTH;
   }
-  return false;
-};
 
-export const startPlayerSlide = (player: Player): void => {
-  if (player.isJumping) return;
-  player.isSliding = true;
-  player.height = PLAYER_INITIAL_CONFIG.slidingHeight;
-  player.y = GROUND_Y - PLAYER_INITIAL_CONFIG.slidingHeight;
-};
-
-export const endPlayerSlide = (player: Player): void => {
-  if (player.isSliding) {
-    player.isSliding = false;
-    player.height = PLAYER_INITIAL_CONFIG.height;
-    player.y = GROUND_Y - PLAYER_INITIAL_CONFIG.height;
+  // 2~3 Frame running animation cycle
+  player.frameTimer += deltaTimeMs;
+  if (player.frameTimer >= PLAYER_CONFIG.animationIntervalMs) {
+    player.frameTimer = 0;
+    player.currentFrame = (player.currentFrame + 1) % PLAYER_CONFIG.totalFrames;
   }
 };

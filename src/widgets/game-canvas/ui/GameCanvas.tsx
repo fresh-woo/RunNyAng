@@ -4,10 +4,15 @@ import './GameCanvas.css';
 
 interface GameCanvasProps {
   canvasRef: React.RefObject<HTMLCanvasElement>;
-  onTouchStart: () => void;
+  onTouchStart?: (e: React.TouchEvent<HTMLCanvasElement>) => void;
+  onTouchEnd?: () => void;
 }
 
-export const GameCanvas: React.FC<GameCanvasProps> = ({ canvasRef, onTouchStart }) => {
+export const GameCanvas: React.FC<GameCanvasProps> = ({
+  canvasRef,
+  onTouchStart,
+  onTouchEnd,
+}) => {
   return (
     <canvas
       ref={canvasRef}
@@ -15,6 +20,7 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({ canvasRef, onTouchStart 
       width={CANVAS_WIDTH}
       height={CANVAS_HEIGHT}
       onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
     />
   );
 };

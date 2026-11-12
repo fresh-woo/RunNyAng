@@ -1,23 +1,25 @@
-import { PLAYER_INITIAL_CONFIG } from '../../../shared/config/gameConfig';
+import { PLAYER_CONFIG } from '../../../shared/config/gameConfig';
 
 export interface Player {
   x: number;
-  y: number;
+  screenY: number;
+  worldY: number;
   width: number;
   height: number;
-  velocityY: number;
-  isJumping: boolean;
-  jumpCount: number;
-  isSliding: boolean;
+  currentFrame: number;
+  frameTimer: number;
+  facing: 'LEFT' | 'RIGHT' | 'UP';
+  isMoving: boolean;
 }
 
 export const createInitialPlayer = (): Player => ({
-  x: PLAYER_INITIAL_CONFIG.x,
-  y: PLAYER_INITIAL_CONFIG.y,
-  width: PLAYER_INITIAL_CONFIG.width,
-  height: PLAYER_INITIAL_CONFIG.height,
-  velocityY: 0,
-  isJumping: false,
-  jumpCount: 0,
-  isSliding: false,
+  x: PLAYER_CONFIG.initialX,
+  screenY: PLAYER_CONFIG.initialY,
+  worldY: 0,
+  width: PLAYER_CONFIG.width,
+  height: PLAYER_CONFIG.height,
+  currentFrame: 0,
+  frameTimer: 0,
+  facing: 'UP',
+  isMoving: true,
 });

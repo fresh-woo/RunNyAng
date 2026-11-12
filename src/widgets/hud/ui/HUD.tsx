@@ -9,17 +9,29 @@ interface HUDProps {
 export const HUD: React.FC<HUDProps> = ({ scoreData }) => {
   return (
     <header className="widget-hud">
-      <div className="hud-metric">
-        <span className="hud-label">거리</span>
-        <span className="hud-value">{scoreData.distance}m</span>
+      <div className="hud-top-row">
+        <div className="hud-stage-title">📍 중앙대 정문 ➔ 310관 (100주년)</div>
+        <div className="hud-coins">🐟 츄르: {scoreData.coins}개</div>
       </div>
-      <div className="hud-metric">
-        <span className="hud-label">코인</span>
-        <span className="hud-value">🪙 {scoreData.coins}</span>
-      </div>
-      <div className="hud-metric">
-        <span className="hud-label">최고기록</span>
-        <span className="hud-value">{scoreData.highScore}m</span>
+
+      <div className="hud-progress-container">
+        <div className="hud-progress-labels">
+          <span>정문 (0m)</span>
+          <span>{scoreData.distance}m / {scoreData.maxDistance}m ({scoreData.progressPercent}%)</span>
+          <span>310관 도착</span>
+        </div>
+        <div className="hud-progress-bar-bg">
+          <div
+            className="hud-progress-bar-fill"
+            style={{ width: `${scoreData.progressPercent}%` }}
+          />
+          <div
+            className="hud-progress-cat-icon"
+            style={{ left: `calc(${scoreData.progressPercent}% - 10px)` }}
+          >
+            🐾
+          </div>
+        </div>
       </div>
     </header>
   );

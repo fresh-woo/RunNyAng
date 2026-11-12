@@ -11,14 +11,19 @@ interface GameOverModalProps {
 export const GameOverModal: React.FC<GameOverModalProps> = ({ scoreData, onRetry }) => {
   return (
     <Overlay>
-      <h2 style={{ fontSize: '2rem', color: '#f87171', marginBottom: '16px' }}>GAME OVER</h2>
-      <div style={{ marginBottom: '24px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        <p style={{ fontSize: '1.2rem' }}>이번 기록: <strong>{scoreData.distance}m</strong></p>
-        <p style={{ fontSize: '1.1rem', color: '#facc15' }}>획득 코인: <strong>{scoreData.coins}개</strong></p>
-        <p style={{ fontSize: '0.95rem', color: '#94a3b8' }}>최고 기록: {scoreData.highScore}m</p>
+      <div style={{ fontSize: '2.5rem', marginBottom: '8px' }}>💥😿</div>
+      <h2 style={{ fontSize: '2rem', color: '#f87171', marginBottom: '12px' }}>앗, 넘어졌습니다!</h2>
+      <p style={{ color: '#94a3b8', fontSize: '0.95rem', marginBottom: '16px' }}>
+        장애물에 걸려 310관까지 가지 못했습니다.
+      </p>
+
+      <div style={{ marginBottom: '24px', display: 'flex', flexDirection: 'column', gap: '8px', background: 'rgba(30, 41, 59, 0.7)', padding: '16px 28px', borderRadius: '12px' }}>
+        <p style={{ fontSize: '1.1rem' }}>달성 진척도: <strong>{scoreData.progressPercent}%</strong> ({scoreData.distance}m)</p>
+        <p style={{ fontSize: '1.05rem', color: '#facc15' }}>수집한 츄르: <strong>{scoreData.coins}개</strong></p>
       </div>
+
       <Button variant="primary" onClick={onRetry}>
-        다시 달리기 (Retry)
+        정문에서 다시 달리기 (Retry)
       </Button>
     </Overlay>
   );
