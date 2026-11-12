@@ -10,6 +10,7 @@ export interface Player {
   frameTimer: number;
   facing: 'LEFT' | 'RIGHT' | 'UP';
   isMoving: boolean;
+  stunTimerMs: number; // 장애물 피격 시 경직/감속 타이머
 }
 
 export const createInitialPlayer = (): Player => ({
@@ -22,4 +23,6 @@ export const createInitialPlayer = (): Player => ({
   frameTimer: 0,
   facing: 'UP',
   isMoving: true,
+  stunTimerMs: 0,
 });
+

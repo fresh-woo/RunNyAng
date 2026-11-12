@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { STAGE_LENGTH } from '../../../shared/config/gameConfig';
+import {
+  STAGE_LENGTH,
+  OBSTACLE_STUN_DURATION_MS,
+} from '../../../shared/config/gameConfig';
 import { GameState, ScoreData } from '../../../shared/types';
 import {
   createInitialPlayer,
@@ -14,7 +17,15 @@ import {
   drawStageObjects,
 } from '../../../entities/stage';
 
-const STORAGE_KEY = 'runnyang_cau_highscore';
+const STORAGE_KEY_BEST_TIME = 'runnyang_cau_best_time';
+const STORAGE_KEY_HIGHSCORE = 'runnyang_cau_highscore';
+
+const getStoredBestTime = (): number | null => {
+  const val = localStorage.getItem(STORAGE_KEY_BEST_TIME);
+  if (!val) return null;
+  const parsed = parseFloat(val);
+  return isNaN(parsed) ? null : parsed;
+};
 
 export const useGameEngine = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -24,8 +35,9 @@ export const useGameEngine = () => {
     maxDistance: STAGE_LENGTH,
     progressPercent: 0,
     coins: 0,
-    highScore: parseInt(localStorage.getItem(STORAGE_KEY) || '0', 10),
+    highScore: parseInt(localStorage.getItem(STORAGE_KEY_HIGHSCORE) || '0', 10),
     elapsedSeconds: 0,
+    bestTimeSeconds: getStoredBestTime(),
   }));
 
   const inputRef = useRef<MovementInput>({
@@ -54,7 +66,7 @@ export const useGameEngine = () => {
       player: createInitialPlayer(),
       objects: getStage1Objects(),
       coinsCollected: 0,
-      startTime: Date.now(),
+      startTime: performance.now(),
       lastFrameTime: performance.now(),
     };
     setGameState('PLAYING');
@@ -64,6 +76,7 @@ export const useGameEngine = () => {
       progressPercent: 0,
       coins: 0,
       elapsedSeconds: 0,
+      bestTimeSeconds: getStoredBestTime(),
     }));
   }, []);
 
@@ -85,7 +98,8 @@ export const useGameEngine = () => {
 
         const currentDist = Math.floor(g.player.worldY);
         const progress = Math.min(100, Math.floor((currentDist / STAGE_LENGTH) * 100));
-        const elapsed = Math.floor((Date.now() - g.startTime) / 1000);
+        // 실시간 경과 시간 (소수점 1자리 초)
+        const elapsed = Math.round(((currentTime - g.startTime) / 1000) * 10) / 10;
 
         // Check collisions with stage objects
         for (const obj of g.objects) {
@@ -100,15 +114,9 @@ export const useGameEngine = () => {
               g.player.x + g.player.width > obj.x
             ) {
               if (obj.type === 'OBSTACLE') {
-                g.state = 'GAMEOVER';
-                setGameState('GAMEOVER');
-                setScoreData((prev) => ({
-                  ...prev,
-                  distance: currentDist,
-                  progressPercent: progress,
-                  elapsedSeconds: elapsed,
-                }));
-                break;
+                // 타임어택 모드: 목숨 소진/게임오버 대신 '경직/감속 페널티' 부여
+                obj.collected = true; // 1회 피격 후 통과 처리
+                g.player.stunTimerMs = OBSTACLE_STUN_DURATION_MS;
               } else if (obj.type === 'ITEM') {
                 obj.collected = true;
                 g.coinsCollected += 1;
@@ -116,16 +124,26 @@ export const useGameEngine = () => {
               } else if (obj.type === 'FINISH_LINE') {
                 g.state = 'CLEAR';
                 setGameState('CLEAR');
+                const finalElapsed = elapsed;
                 setScoreData((prev) => {
+                  const currentBest = prev.bestTimeSeconds;
+                  const newBest =
+                    currentBest === null || finalElapsed < currentBest
+                      ? finalElapsed
+                      : currentBest;
+                  localStorage.setItem(STORAGE_KEY_BEST_TIME, newBest.toString());
+
                   const newHigh = Math.max(prev.highScore, currentDist);
-                  localStorage.setItem(STORAGE_KEY, newHigh.toString());
+                  localStorage.setItem(STORAGE_KEY_HIGHSCORE, newHigh.toString());
+
                   return {
                     ...prev,
                     distance: currentDist,
                     progressPercent: 100,
                     coins: g.coinsCollected,
                     highScore: newHigh,
-                    elapsedSeconds: elapsed,
+                    elapsedSeconds: finalElapsed,
+                    bestTimeSeconds: newBest,
                   };
                 });
                 break;
@@ -166,3 +184,4 @@ export const useGameEngine = () => {
     setInput,
   };
 };
+
