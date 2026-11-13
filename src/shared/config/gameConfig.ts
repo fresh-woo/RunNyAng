@@ -21,13 +21,14 @@ export const STAGE_LENGTH = 27000; // 정문에서 310관까지의 총 거리 (�
 export const OBSTACLE_STUN_DURATION_MS = 1200; // 충돌 시 경직/감속 지속 시간 (ms)
 export const OBSTACLE_SLOW_FACTOR = 0.35; // 충돌 경직 중 전진 속도 배율 (35%)
 
-// Player configuration (Cute Cat Dummy)
+// Player configuration (Cat Pixel Sprite)
 export const PLAYER_CONFIG = {
-  width: 44,
-  height: 44,
+  width: 52,
+  height: 52,
   initialX: 480,
   initialY: 420,
-  animationIntervalMs: 140, // 달리기 교차 주기
+  animationIntervalMs: 130, // 달리기 3프레임 교차 주기
   totalFrames: 3,
 };
+
 

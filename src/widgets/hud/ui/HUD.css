@@ -45,12 +45,23 @@
 }
 
 .hud-coins {
+  display: flex;
+  align-items: center;
+  gap: 5px;
   font-size: 1rem;
   color: #facc15;
   background: rgba(15, 23, 42, 0.7);
-  padding: 4px 12px;
+  padding: 4px 10px;
   border-radius: 9999px;
   border: 1px solid rgba(250, 204, 21, 0.3);
+  font-weight: 700;
+}
+
+.hud-churu-icon {
+  height: 20px;
+  width: auto;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
 }
 
 .hud-progress-container {
@@ -59,8 +70,8 @@
   gap: 4px;
   background: rgba(15, 23, 42, 0.6);
   padding: 8px 12px;
-  border-radius: 8px;
-  backdrop-filter: blur(2px);
+  border: 2px solid #0e0920;
+  box-shadow: 0 3px 0 #0e0920, inset 0 0 0 2px #69418d;
 }
 
 .hud-progress-labels {
@@ -74,22 +85,35 @@
 .hud-progress-bar-bg {
   position: relative;
   width: 100%;
-  height: 8px;
-  background-color: #334155;
-  border-radius: 9999px;
+  height: 17px;
+  background: #202a50;
+  border: 3px solid #110d24;
+  box-shadow: inset 0 0 0 2px #4b6dba, 0 2px 0 #110d24;
   overflow: visible;
 }
 
 .hud-progress-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, #38bdf8, #60a5fa);
-  border-radius: 9999px;
+  background: repeating-linear-gradient(90deg, #5eaff0 0 10px, #73c5f3 10px 20px);
+  box-shadow: inset 0 -3px 0 #3565b4;
   transition: width 0.1s linear;
 }
 
 .hud-progress-cat-icon {
   position: absolute;
-  top: -8px;
-  font-size: 14px;
+  top: 50%;
+  width: 29px;
+  height: 29px;
+  object-fit: contain;
+  transform: translate(-50%, -50%);
+  image-rendering: pixelated;
   transition: left 0.1s linear;
+}
+
+@media (max-width: 768px) {
+  .widget-hud { left: 8px; right: 8px; top: 8px; }
+  .hud-top-row { flex-wrap: wrap; gap: 5px; }
+  .hud-stage-title, .hud-timer, .hud-coins { font-size: 0.78rem; padding: 3px 7px; }
+  .hud-status-group { gap: 5px; }
+  .hud-progress-labels { font-size: 0.65rem; }
 }

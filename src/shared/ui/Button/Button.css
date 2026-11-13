@@ -10,7 +10,7 @@
 }
 
 .btn:active {
-  transform: scale(0.95);
+  transform: scale(0.93);
 }
 
 .btn-primary {
@@ -29,4 +29,34 @@
 
 .btn-secondary:hover {
   background-color: #475569;
+}
+
+/* Pixel art sprite button */
+.btn-pixel {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: manipulation;
+  transition: transform 0.1s ease, filter 0.1s ease;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
+}
+
+.btn-pixel:hover {
+  filter: drop-shadow(0 4px 10px rgba(255,255,255,0.25)) brightness(1.08);
+}
+
+.btn-pixel:active {
+  transform: scale(0.9);
+}
+
+.btn-pixel-img {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  height: 72px;
+  width: auto;
+  display: block;
 }

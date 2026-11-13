@@ -5,6 +5,7 @@ import {
   ROAD_RIGHT,
 } from '../../../shared/config/gameConfig';
 import { StageObject } from '../model/types';
+import { GameAssets } from '../../../shared/lib/assetLoader';
 
 export const drawCampusEnvironment = (
   ctx: CanvasRenderingContext2D,
@@ -43,7 +44,8 @@ export const drawStageObjects = (
   ctx: CanvasRenderingContext2D,
   objects: StageObject[],
   playerWorldY: number,
-  playerScreenY: number
+  playerScreenY: number,
+  assets?: GameAssets | null
 ): void => {
   for (const obj of objects) {
     if (obj.collected) continue;
@@ -52,7 +54,7 @@ export const drawStageObjects = (
     const relScreenY = playerScreenY - (obj.worldY - playerWorldY);
 
     // Cull off-screen objects
-    if (relScreenY < -120 || relScreenY > CANVAS_HEIGHT + 100) continue;
+    if (relScreenY < -140 || relScreenY > CANVAS_HEIGHT + 120) continue;
 
     ctx.save();
 
@@ -79,29 +81,50 @@ export const drawStageObjects = (
       ctx.textAlign = 'center';
       ctx.fillText(obj.name, obj.x + obj.width / 2, relScreenY - 8);
     } else if (obj.type === 'ITEM') {
-      // Draw Churu (Cat treat)
-      ctx.fillStyle = '#ec4899';
-      ctx.beginPath();
-      ctx.roundRect(obj.x, relScreenY, obj.width, obj.height, 4);
-      ctx.fill();
+      const churuImg = assets?.stageAssets.itemChuru;
+      if (churuImg && churuImg.complete) {
+        ctx.drawImage(churuImg, obj.x, relScreenY, obj.width + 10, obj.height + 10);
+      } else {
+        // Fallback
+        ctx.fillStyle = '#ec4899';
+        ctx.beginPath();
+        ctx.roundRect(obj.x, relScreenY, obj.width, obj.height, 4);
+        ctx.fill();
 
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 10px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('츄르', obj.x + obj.width / 2, relScreenY + 16);
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 10px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('츄르', obj.x + obj.width / 2, relScreenY + 16);
+      }
     } else if (obj.type === 'OBSTACLE') {
-      // Draw Obstacle (Kickboard, Coffee, Exam)
-      ctx.fillStyle = obj.color || '#ef4444';
-      ctx.beginPath();
-      ctx.roundRect(obj.x, relScreenY, obj.width, obj.height, 6);
-      ctx.fill();
+      let sprite: HTMLImageElement | null | undefined = null;
+      if (obj.subType === 'COFFEE') {
+        sprite = assets?.stageAssets.obsCoffee;
+      } else if (obj.subType === 'EXAM') {
+        sprite = assets?.stageAssets.obsBooks;
+      } else if (obj.name.includes('라바콘') || obj.name.includes('공사')) {
+        sprite = assets?.stageAssets.obsCone;
+      } else if (obj.subType === 'KICKBOARD') {
+        sprite = assets?.stageAssets.obsCone; // substitute cone/barrier
+      }
 
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '10px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText(obj.name.slice(0, 5), obj.x + obj.width / 2, relScreenY - 4);
+      if (sprite && sprite.complete) {
+        ctx.drawImage(sprite, obj.x, relScreenY, obj.width, obj.height);
+      } else {
+        // Fallback
+        ctx.fillStyle = obj.color || '#ef4444';
+        ctx.beginPath();
+        ctx.roundRect(obj.x, relScreenY, obj.width, obj.height, 6);
+        ctx.fill();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '10px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(obj.name.slice(0, 5), obj.x + obj.width / 2, relScreenY - 4);
+      }
     }
 
     ctx.restore();
   }
 };
+

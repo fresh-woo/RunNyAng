@@ -6,6 +6,7 @@ import { GameCanvas } from '../../../widgets/game-canvas';
 import { ReadyOverlay } from '../../../widgets/ready-overlay';
 import { GameOverModal } from '../../../widgets/game-over-modal';
 import { StageClearModal } from '../../../widgets/stage-clear-modal';
+import { MobileDPad } from '../../../widgets/mobile-dpad';
 import './GamePage.css';
 
 export const GamePage: React.FC = () => {
@@ -23,6 +24,10 @@ export const GamePage: React.FC = () => {
     movementInput,
     handleTouchStart,
     handleTouchEnd,
+    setMoveLeft,
+    setMoveRight,
+    setMoveUp,
+    setMoveDown,
   } = useGameControls({
     onStartOrRestart: startOrRestartGame,
     isReadyOrEnded,
@@ -57,10 +62,21 @@ export const GamePage: React.FC = () => {
           <StageClearModal scoreData={scoreData} onRetry={startOrRestartGame} />
         )}
 
+        {/* 모바일 D-PAD 가상 방향키 (인게임 중에만 표시) */}
+        {gameState === 'PLAYING' && (
+          <MobileDPad
+            onLeft={setMoveLeft}
+            onRight={setMoveRight}
+            onUp={setMoveUp}
+            onDown={setMoveDown}
+          />
+        )}
+
         <footer className="controls-hint-bar">
-          🎮 조작법: [← / → 또는 A / D] 좌우 이동 | [↑ / W] 가속 | [↓ / S] 감속 | 모바일: 화면 좌/우 터치
+          🎮 조작법: [← / →] 좌우 이동 | [↑ / W] 가속 | [↓ / S] 감속 | 모바일: 화면 하단 D-PAD
         </footer>
       </div>
     </main>
   );
 };
+

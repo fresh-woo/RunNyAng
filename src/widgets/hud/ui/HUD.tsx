@@ -1,6 +1,8 @@
 import React from 'react';
 import { ScoreData } from '../../../shared/types';
 import './HUD.css';
+import iconChuruUrl from '../../../assets/images/ui/icon_churu.png';
+import catPortraitUrl from '../../../assets/images/cat/cat_portrait.png';
 
 interface HUDProps {
   scoreData: ScoreData;
@@ -14,30 +16,28 @@ export const HUD: React.FC<HUDProps> = ({ scoreData }) => {
   return (
     <header className="widget-hud">
       <div className="hud-top-row">
-        <div className="hud-stage-title">📍 중앙대 정문 ➔ 310관 (100주년)</div>
+        <div className="hud-stage-title">📍 중앙대 정문 ➔ 310관</div>
         <div className="hud-status-group">
           <div className="hud-timer">⏱️ {formattedTime}</div>
-          <div className="hud-coins">🐟 츄르: {scoreData.coins}개</div>
+          <div className="hud-coins">
+            <img src={iconChuruUrl} alt="츄르" className="hud-churu-icon" />
+            {scoreData.coins}개
+          </div>
         </div>
       </div>
 
       <div className="hud-progress-container">
         <div className="hud-progress-labels">
-          <span>정문 (0m)</span>
+          <span>정문</span>
           <span>{scoreData.distance}m / {scoreData.maxDistance}m ({scoreData.progressPercent}%)</span>
-          <span>310관 도착</span>
+          <span>310관</span>
         </div>
-        <div className="hud-progress-bar-bg">
+        <div className="hud-progress-bar-bg" role="progressbar" aria-label="310관까지의 거리" aria-valuenow={scoreData.progressPercent} aria-valuemin={0} aria-valuemax={100}>
           <div
             className="hud-progress-bar-fill"
             style={{ width: `${scoreData.progressPercent}%` }}
           />
-          <div
-            className="hud-progress-cat-icon"
-            style={{ left: `calc(${scoreData.progressPercent}% - 10px)` }}
-          >
-            🐾
-          </div>
+          <img src={catPortraitUrl} alt="" className="hud-progress-cat-icon" style={{ left: `${scoreData.progressPercent}%` }} />
         </div>
       </div>
     </header>

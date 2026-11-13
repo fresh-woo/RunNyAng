@@ -16,6 +16,7 @@ import {
   drawCampusEnvironment,
   drawStageObjects,
 } from '../../../entities/stage';
+import { loadGameAssets, GameAssets } from '../../../shared/lib/assetLoader';
 
 const STORAGE_KEY_BEST_TIME = 'runnyang_cau_best_time';
 const STORAGE_KEY_HIGHSCORE = 'runnyang_cau_highscore';
@@ -56,6 +57,8 @@ export const useGameEngine = () => {
     lastFrameTime: performance.now(),
   });
 
+  const assetsRef = useRef<GameAssets | null>(null);
+
   const setInput = useCallback((input: MovementInput) => {
     inputRef.current = input;
   }, []);
@@ -86,6 +89,14 @@ export const useGameEngine = () => {
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
+
+    // 픽셀아트 안티앨리어싱 OFF
+    ctx.imageSmoothingEnabled = false;
+
+    // 에셋 비동기 로드 (렌더링은 로드 완료 전에도 fallback으로 동작)
+    loadGameAssets().then((assets) => {
+      assetsRef.current = assets;
+    });
 
     const gameLoop = (currentTime: number) => {
       const g = engineStateRef.current;
@@ -164,10 +175,15 @@ export const useGameEngine = () => {
       drawCampusEnvironment(ctx, g.player.worldY);
 
       // Draw Stage Objects (Landmarks, Obstacles, Finish Line)
-      drawStageObjects(ctx, g.objects, g.player.worldY, g.player.screenY);
+      drawStageObjects(ctx, g.objects, g.player.worldY, g.player.screenY, assetsRef.current);
 
-      // Draw Player Cat (2~3 Frame cycle)
-      drawPlayer(ctx, g.player);
+      // Draw Player Cat (3-frame running sprite)
+      drawPlayer(
+        ctx,
+        g.player,
+        assetsRef.current?.catRunFrames,
+        assetsRef.current?.catHurt
+      );
 
       animationFrameId = requestAnimationFrame(gameLoop);
     };

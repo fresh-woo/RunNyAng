@@ -2,6 +2,7 @@ import React from 'react';
 import { Overlay } from '../../../shared/ui/Overlay/Overlay';
 import { Button } from '../../../shared/ui/Button/Button';
 import { ScoreData } from '../../../shared/types';
+import catHurtUrl from '../../../assets/images/cat/cat_hurt.png';
 
 interface GameOverModalProps {
   scoreData: ScoreData;
@@ -11,7 +12,18 @@ interface GameOverModalProps {
 export const GameOverModal: React.FC<GameOverModalProps> = ({ scoreData, onRetry }) => {
   return (
     <Overlay>
-      <div style={{ fontSize: '2.5rem', marginBottom: '8px' }}>💥😿</div>
+      <img
+        src={catHurtUrl}
+        alt="아파하는 냥이"
+        style={{
+          height: '100px',
+          width: 'auto',
+          marginBottom: '10px',
+          imageRendering: 'pixelated',
+          filter: 'drop-shadow(0 4px 10px rgba(0,0,0,0.5))',
+        }}
+        draggable={false}
+      />
       <h2 style={{ fontSize: '2rem', color: '#f87171', marginBottom: '12px' }}>앗, 넘어졌습니다!</h2>
       <p style={{ color: '#94a3b8', fontSize: '0.95rem', marginBottom: '16px' }}>
         장애물에 걸려 310관까지 가지 못했습니다.
@@ -22,9 +34,10 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({ scoreData, onRetry
         <p style={{ fontSize: '1.05rem', color: '#facc15' }}>수집한 츄르: <strong>{scoreData.coins}개</strong></p>
       </div>
 
-      <Button variant="primary" onClick={onRetry}>
-        정문에서 다시 달리기 (Retry)
+      <Button variant="retry" onClick={onRetry}>
+        정문에서 다시 달리기
       </Button>
     </Overlay>
   );
 };
+

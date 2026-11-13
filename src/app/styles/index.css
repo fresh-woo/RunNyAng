@@ -25,3 +25,13 @@ html, body {
   justify-content: center;
   align-items: center;
 }
+
+/* 픽셀아트 이미지 전역 렌더링 품질 */
+img[class*="pixel"],
+img.dpad-img,
+img.btn-pixel-img,
+img.hud-churu-icon,
+canvas {
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
+}

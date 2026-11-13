@@ -92,10 +92,31 @@ export const useGameControls = ({
     updateInput((prev) => ({ ...prev, moveLeft: false, moveRight: false }));
   };
 
+  // Individual directional setters for D-PAD buttons
+  const setMoveLeft = useCallback((pressed: boolean) => {
+    updateInput((prev) => ({ ...prev, moveLeft: pressed, moveRight: pressed ? false : prev.moveRight }));
+  }, [updateInput]);
+
+  const setMoveRight = useCallback((pressed: boolean) => {
+    updateInput((prev) => ({ ...prev, moveRight: pressed, moveLeft: pressed ? false : prev.moveLeft }));
+  }, [updateInput]);
+
+  const setMoveUp = useCallback((pressed: boolean) => {
+    updateInput((prev) => ({ ...prev, moveUp: pressed }));
+  }, [updateInput]);
+
+  const setMoveDown = useCallback((pressed: boolean) => {
+    updateInput((prev) => ({ ...prev, moveDown: pressed }));
+  }, [updateInput]);
+
   return {
     movementInput: inputRef.current,
     stateMovementInput: movementInput,
     handleTouchStart,
     handleTouchEnd,
+    setMoveLeft,
+    setMoveRight,
+    setMoveUp,
+    setMoveDown,
   };
 };

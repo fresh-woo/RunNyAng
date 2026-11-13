@@ -3,32 +3,56 @@ import { Player } from '../model/types';
 export const drawPlayer = (
   ctx: CanvasRenderingContext2D,
   player: Player,
-  customFrames?: (HTMLImageElement | null)[]
+  catFrames?: (HTMLImageElement | null)[],
+  catHurtImg?: HTMLImageElement | null
 ): void => {
   const { x, screenY, width, height, currentFrame } = player;
+  const isStunned = player.stunTimerMs > 0;
 
-  // If the designer has supplied real image frames, render them!
-  if (customFrames && customFrames[currentFrame]) {
-    const img = customFrames[currentFrame]!;
-    ctx.drawImage(img, x, screenY, width, height);
+  ctx.save();
+
+  // 1. Shadow underneath
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.28)';
+  ctx.beginPath();
+  ctx.ellipse(x + width / 2, screenY + height - 2, width / 2.2, 7, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // 2. If stunned and hurt image exists, render hurt expression
+  if (isStunned && catHurtImg && catHurtImg.complete) {
+    ctx.drawImage(catHurtImg, x, screenY, width, height);
+
+    ctx.fillStyle = '#ef4444';
+    ctx.font = 'bold 12px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('⚡경직!', x + width / 2, screenY - 4);
+
+    ctx.restore();
     return;
   }
 
-  // --- DUMMY CUTE PIXEL-ART CAT RENDERER (2~3 Frame Alternating) ---
-  ctx.save();
+  // 3. Render pixel art running cat frame if available
+  const frameImg = catFrames && catFrames[currentFrame];
+  if (frameImg && frameImg.complete) {
+    // Vertical bobbing feeling
+    const bobY = currentFrame === 1 ? -4 : 0;
+    ctx.drawImage(frameImg, x, screenY + bobY, width, height);
 
-  // Shadow underneath
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
-  ctx.beginPath();
-  ctx.ellipse(x + width / 2, screenY + height - 2, width / 2, 8, 0, 0, Math.PI * 2);
-  ctx.fill();
+    if (isStunned) {
+      ctx.fillStyle = '#ef4444';
+      ctx.font = 'bold 12px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('⚡경직!', x + width / 2, screenY - 4);
+    }
 
-  // Vertical bobbing effect per frame
+    ctx.restore();
+    return;
+  }
+
+  // 4. Fallback: Dummy pixel-art cat renderer
   const bobY = currentFrame === 1 ? -2 : 0;
 
-  // Cat Body (Warm cream / Calico cute style)
-  ctx.fillStyle = '#fef08a'; // Light cute yellow/cream body
-  ctx.strokeStyle = '#854d0e'; // Warm dark outline
+  ctx.fillStyle = '#fef08a';
+  ctx.strokeStyle = '#854d0e';
   ctx.lineWidth = 3;
 
   ctx.beginPath();
@@ -36,9 +60,7 @@ export const drawPlayer = (
   ctx.fill();
   ctx.stroke();
 
-  // Cat Ears (pointed towards front/diagonal)
   ctx.fillStyle = '#f59e0b';
-  // Left ear
   ctx.beginPath();
   ctx.moveTo(x + 8, screenY + 12 + bobY);
   ctx.lineTo(x + 14, screenY + bobY);
@@ -47,7 +69,6 @@ export const drawPlayer = (
   ctx.fill();
   ctx.stroke();
 
-  // Right ear
   ctx.beginPath();
   ctx.moveTo(x + width - 20, screenY + 12 + bobY);
   ctx.lineTo(x + width - 14, screenY + bobY);
@@ -56,7 +77,6 @@ export const drawPlayer = (
   ctx.fill();
   ctx.stroke();
 
-  // Cat Tail (sways based on frame 0, 1, 2)
   const tailSway = currentFrame === 0 ? -8 : currentFrame === 2 ? 8 : 0;
   ctx.strokeStyle = '#f59e0b';
   ctx.lineWidth = 5;
@@ -71,35 +91,13 @@ export const drawPlayer = (
   );
   ctx.stroke();
 
-  // Running Paws (Alternating frames for realistic cute run motion)
-  ctx.fillStyle = '#ffffff';
-  ctx.strokeStyle = '#854d0e';
-  ctx.lineWidth = 2;
-
-  // Left Paw
-  const leftPawOffset = currentFrame === 0 ? -4 : currentFrame === 1 ? 0 : 4;
-  ctx.beginPath();
-  ctx.arc(x + 10, screenY + height - 6 + leftPawOffset, 5, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.stroke();
-
-  // Right Paw
-  const rightPawOffset = currentFrame === 2 ? -4 : currentFrame === 1 ? 0 : 4;
-  ctx.beginPath();
-  ctx.arc(x + width - 10, screenY + height - 6 + rightPawOffset, 5, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.stroke();
-
-  // Small frame indicator badge (helpful for planner & designer verification)
-  if (player.stunTimerMs > 0) {
+  if (isStunned) {
     ctx.fillStyle = '#ef4444';
     ctx.font = 'bold 11px sans-serif';
-    ctx.fillText('⚡경직!', x + width / 2 - 12, screenY - 2);
-  } else {
-    ctx.fillStyle = '#38bdf8';
-    ctx.font = 'bold 10px monospace';
-    ctx.fillText(`F${currentFrame + 1}`, x + width / 2 - 8, screenY + 6);
+    ctx.textAlign = 'center';
+    ctx.fillText('⚡경직!', x + width / 2, screenY - 2);
   }
 
   ctx.restore();
 };
+

@@ -1,0 +1,78 @@
+.mobile-dpad-container {
+  display: none; /* 데스크탑에서는 숨김 */
+  position: absolute;
+  bottom: 44px;
+  left: 24px;
+  width: 180px;
+  height: 180px;
+  z-index: 10;
+  pointer-events: auto;
+}
+
+@media (max-width: 768px), (pointer: coarse) {
+  .mobile-dpad-container {
+    display: block;
+  }
+}
+
+.dpad-btn {
+  position: absolute;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.08s ease, filter 0.08s ease;
+}
+
+.dpad-btn:active {
+  transform: scale(0.88);
+  filter: brightness(1.3);
+}
+
+.dpad-img {
+  width: 56px;
+  height: 56px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  display: block;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
+}
+
+/* Cross layout: Up center-top, Left left-center, Right right-center, Down center-bottom */
+.dpad-up {
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.dpad-up:active {
+  transform: translateX(-50%) scale(0.88);
+}
+
+.dpad-left {
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+}
+.dpad-left:active {
+  transform: translateY(-50%) scale(0.88);
+}
+
+.dpad-right {
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+}
+.dpad-right:active {
+  transform: translateY(-50%) scale(0.88);
+}
+
+.dpad-down {
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.dpad-down:active {
+  transform: translateX(-50%) scale(0.88);
+}
