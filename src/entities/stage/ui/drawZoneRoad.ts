@@ -476,29 +476,3 @@ const drawSidewalkQuad = (
   ctx.closePath();
   ctx.fill();
 };
-
-/**
- * 노면 화살표 렌더링 헬퍼
- */
-const drawRoadArrow = (
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  scale: number
-): void => {
-  ctx.save();
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
-  const s = scale * 100;
-
-  ctx.beginPath();
-  ctx.moveTo(x, y - s * 1.5);
-  ctx.lineTo(x + s * 0.7, y - s * 0.7);
-  ctx.lineTo(x + s * 0.3, y - s * 0.7);
-  ctx.lineTo(x + s * 0.3, y + s * 0.8);
-  ctx.lineTo(x - s * 0.3, y + s * 0.8);
-  ctx.lineTo(x - s * 0.3, y - s * 0.7);
-  ctx.lineTo(x - s * 0.7, y - s * 0.7);
-  ctx.closePath();
-  ctx.fill();
-  ctx.restore();
-};
