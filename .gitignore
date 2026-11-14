@@ -31,3 +31,7 @@ dist-ssr
 # TypeScript build info
 *.tsbuildinfo
 
+
+# Ranking server local data
+server/data/
+__pycache__/

@@ -1,0 +1,20 @@
+services:
+  ranking-api:
+    build: ./server
+    container_name: runnyang-ranking-api
+    restart: unless-stopped
+    ports:
+      - "${RANKING_API_PORT:-5000}:5000"
+    environment:
+      # 쉼표로 구분한 허용 Origin 목록 (프론트 배포 주소를 넣어 주세요)
+      CORS_ORIGINS: "${CORS_ORIGINS:-https://runnyang.sublumen.xyz,http://localhost:3000,http://127.0.0.1:3000}"
+    volumes:
+      - ranking-data:/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  ranking-data:
