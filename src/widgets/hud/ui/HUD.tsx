@@ -49,6 +49,7 @@ export const HUD: React.FC<HUDProps> = ({ scoreData, gameState, onTogglePause })
         </div>
       </div>
 
+      {gameState !== 'CLEAR' && (
       <div className="hud-progress-container">
         <div className="hud-progress-labels">
           <span>정문</span>
@@ -63,6 +64,7 @@ export const HUD: React.FC<HUDProps> = ({ scoreData, gameState, onTogglePause })
           <img src={catPortraitUrl} alt="" className="hud-progress-cat-icon" style={{ left: `${scoreData.progressPercent}%` }} />
         </div>
       </div>
+      )}
     </header>
   );
 };
