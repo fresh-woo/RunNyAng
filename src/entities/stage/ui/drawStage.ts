@@ -4,6 +4,7 @@ import {
 import { StageObject } from '../model/types';
 import { GameAssets } from '../../../shared/lib/assetLoader';
 import { project, SHADOW_CONFIG } from '../lib/projection';
+import { getObjectHitbox, getPlayerHitbox, SHOW_HITBOX } from '../lib/hitbox';
 import { drawParallaxSky } from './drawParallaxSky';
 import { drawZoneRoad } from './drawZoneRoad';
 import { drawCampusBuildings } from './drawCampusBuildings';
@@ -130,6 +131,8 @@ export const drawStageObjects = (
             sprite = assets?.stageAssets.obsBooks;
           } else if (obj.name.includes('라바콘') || obj.name.includes('공사')) {
             sprite = assets?.stageAssets.obsCone;
+          } else if (obj.subType === 'STUDENT') {
+            sprite = assets?.stageAssets.obsStudent;
           } else if (obj.subType === 'KICKBOARD') {
             sprite = assets?.stageAssets.obsCone;
           }
@@ -174,6 +177,26 @@ export const drawStageObjects = (
 
   for (const item of renderQueue) {
     item.render();
+  }
+
+  // 4. 개발용 히트박스 표시 (?hitbox)
+  if (SHOW_HITBOX) {
+    ctx.save();
+    ctx.lineWidth = 2;
+    for (const obj of objects) {
+      if (obj.collected || obj.type === 'LANDMARK') continue;
+      const relMeters = obj.worldY - playerWorldY;
+      if (relMeters < -6 || relMeters > 55) continue;
+      const r = getObjectHitbox(obj, playerWorldY);
+      ctx.strokeStyle = obj.type === 'ITEM' ? '#22c55e' : '#ef4444';
+      ctx.strokeRect(r.x, r.y, r.w, r.h);
+    }
+    if (playerObj) {
+      const r = getPlayerHitbox(playerObj);
+      ctx.strokeStyle = '#facc15';
+      ctx.strokeRect(r.x, r.y, r.w, r.h);
+    }
+    ctx.restore();
   }
 };
 
