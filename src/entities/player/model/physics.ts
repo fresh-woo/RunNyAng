@@ -1,7 +1,8 @@
 import {
-  BASE_FORWARD_SPEED,
+  WALK_SPEED,
+  RUN_SPEED,
+  SLOW_WALK_SPEED,
   LATERAL_SPEED,
-  FORWARD_SPEED_BOOST,
   OBSTACLE_SLOW_FACTOR,
   ROAD_LEFT,
   ROAD_RIGHT,
@@ -45,24 +46,36 @@ export const updatePlayerMovement = (
   const maxX = ROAD_RIGHT - player.width - 10;
   player.x = Math.max(minX, Math.min(maxX, player.x));
 
-  // Forward running (Automatic forward progression + Up boost / Down brake)
-  let currentSpeed = BASE_FORWARD_SPEED;
-  if (input.moveUp) currentSpeed += FORWARD_SPEED_BOOST;
-  if (input.moveDown) currentSpeed = Math.max(1.0, currentSpeed - FORWARD_SPEED_BOOST);
-
-  if (isStunned) {
-    currentSpeed *= OBSTACLE_SLOW_FACTOR;
+  // Forward movement (초당 m/s 기준, deltaTimeMs 기반 이동)
+  // 그냥 걷는 속도: 3.0 m/s
+  // 달리는 속도: 6.0 m/s
+  // 느리게 걷는 속도: 1.5 m/s
+  let speedMps = WALK_SPEED;
+  if (input.moveUp) {
+    speedMps = RUN_SPEED;
+  } else if (input.moveDown) {
+    speedMps = SLOW_WALK_SPEED;
   }
 
-  player.worldY += currentSpeed;
+  if (isStunned) {
+    speedMps *= OBSTACLE_SLOW_FACTOR;
+  }
+
+  const dtSeconds = deltaTimeMs / 1000;
+  player.worldY += speedMps * dtSeconds;
   if (player.worldY > STAGE_LENGTH) {
     player.worldY = STAGE_LENGTH;
   }
 
-  // Running animation cycle
-  const animInterval = isStunned
-    ? PLAYER_CONFIG.animationIntervalMs * 2
-    : PLAYER_CONFIG.animationIntervalMs;
+  // Running animation cycle (속도 상태에 따른 발구름 주기 동적 반영)
+  let animInterval = PLAYER_CONFIG.animationIntervalMs;
+  if (isStunned) {
+    animInterval = 240;
+  } else if (input.moveUp) {
+    animInterval = 80;
+  } else if (input.moveDown) {
+    animInterval = 180;
+  }
 
   player.frameTimer += deltaTimeMs;
   if (player.frameTimer >= animInterval) {

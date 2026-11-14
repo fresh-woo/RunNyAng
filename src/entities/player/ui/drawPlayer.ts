@@ -1,4 +1,5 @@
 import { Player } from '../model/types';
+import { SHADOW_CONFIG } from '../../stage/lib/projection';
 
 export const drawPlayer = (
   ctx: CanvasRenderingContext2D,
@@ -11,10 +12,18 @@ export const drawPlayer = (
 
   ctx.save();
 
-  // 1. Shadow underneath
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.28)';
+  // 1. 3/4 쿼터뷰 타원 그림자 (빛이 왼쪽 위에서 오므로 오른쪽 아래로 드리움)
+  ctx.fillStyle = SHADOW_CONFIG.color;
   ctx.beginPath();
-  ctx.ellipse(x + width / 2, screenY + height - 2, width / 2.2, 7, 0, 0, Math.PI * 2);
+  ctx.ellipse(
+    x + width / 2 + SHADOW_CONFIG.offsetX * 0.7,
+    screenY + height - 2 + SHADOW_CONFIG.offsetY * 0.7,
+    width / 2.1,
+    7.5,
+    0.18, // 3/4 쿼터뷰 각도 기울기
+    0,
+    Math.PI * 2
+  );
   ctx.fill();
 
   // 2. If stunned and hurt image exists, render hurt expression
@@ -24,7 +33,7 @@ export const drawPlayer = (
     ctx.fillStyle = '#ef4444';
     ctx.font = 'bold 12px sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('⚡경직!', x + width / 2, screenY - 4);
+    ctx.fillText('⚡경직!', x + width / 2, screenY - 6);
 
     ctx.restore();
     return;
@@ -41,7 +50,7 @@ export const drawPlayer = (
       ctx.fillStyle = '#ef4444';
       ctx.font = 'bold 12px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('⚡경직!', x + width / 2, screenY - 4);
+      ctx.fillText('⚡경직!', x + width / 2, screenY - 6);
     }
 
     ctx.restore();
@@ -95,7 +104,7 @@ export const drawPlayer = (
     ctx.fillStyle = '#ef4444';
     ctx.font = 'bold 11px sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('⚡경직!', x + width / 2, screenY - 2);
+    ctx.fillText('⚡경직!', x + width / 2, screenY - 4);
   }
 
   ctx.restore();
