@@ -101,11 +101,11 @@ export const cauStage1Data: StageData = {
     { id: 'obs_2_1', name: '방치된 킥보드', worldY: 140, x: 550, width: 36, height: 48, type: 'OBSTACLE', subType: 'KICKBOARD', color: '#10b981' },
 
     // ----------------------------------------------------
-    // [구간 3: 160m ~ 200m] 나무 광장 (160_200.png)
+    // [구간 3: 160m ~ 200m] 빼빼로 광장 (160_200.png)
     // ----------------------------------------------------
     { id: 'item_2_2', name: '츄르', worldY: 165, x: 480, width: 24, height: 24, type: 'ITEM', subType: 'CHURU' },
     // [180m Landmark] 나무 광장 (중앙 광장)
-    { id: 'lm_2', name: '🌳 나무 광장', worldY: 180, x: ROAD_LEFT - 30, width: 85, height: 45, type: 'LANDMARK' },
+    { id: 'lm_2', name: '🌳 빼빼로 광장', worldY: 180, x: ROAD_LEFT - 30, width: 85, height: 45, type: 'LANDMARK' },
     { id: 'obs_2_2', name: '광장 화단 경계석', worldY: 190, x: 380, width: 50, height: 32, type: 'OBSTACLE', color: '#0284c7' },
 
     // ----------------------------------------------------

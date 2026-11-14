@@ -27,7 +27,7 @@ export interface StageObject {
   height: number;
   type: StageObjectType;
   color?: string;
-  subType?: 'KICKBOARD' | 'COFFEE' | 'EXAM' | 'CHURU' | 'BLUE_DRAGON' | 'BUILDING_310';
+  subType?: 'KICKBOARD' | 'COFFEE' | 'EXAM' | 'CHURU' | 'BLUE_DRAGON' | 'BUILDING_310' | 'STUDENT';
   collected?: boolean;
 }
 

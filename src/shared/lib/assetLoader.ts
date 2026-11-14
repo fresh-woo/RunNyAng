@@ -9,6 +9,7 @@ import obsBusUrl from '../../assets/images/stage/obs_bus.png';
 import obsCoffeeUrl from '../../assets/images/stage/obs_coffee.png';
 import obsBooksUrl from '../../assets/images/stage/obs_books.png';
 import obsConeUrl from '../../assets/images/stage/obs_cone.png';
+import obsStudentUrl from '../../assets/images/stage/obs_student.png';
 
 export interface GameAssets {
   catRunFrames: (HTMLImageElement | null)[];
@@ -20,6 +21,7 @@ export interface GameAssets {
     obsCoffee: HTMLImageElement | null;
     obsBooks: HTMLImageElement | null;
     obsCone: HTMLImageElement | null;
+    obsStudent: HTMLImageElement | null;
   };
 }
 
@@ -51,6 +53,7 @@ export const loadGameAssets = async (): Promise<GameAssets> => {
     obsCoffee,
     obsBooks,
     obsCone,
+    obsStudent,
   ] = await Promise.all([
     loadImage(catRun1Url),
     loadImage(catRun2Url),
@@ -62,6 +65,7 @@ export const loadGameAssets = async (): Promise<GameAssets> => {
     loadImage(obsCoffeeUrl),
     loadImage(obsBooksUrl),
     loadImage(obsConeUrl),
+    loadImage(obsStudentUrl),
   ]);
 
   cachedAssets = {
@@ -74,6 +78,7 @@ export const loadGameAssets = async (): Promise<GameAssets> => {
       obsCoffee,
       obsBooks,
       obsCone,
+      obsStudent,
     },
   };
 
