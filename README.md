@@ -84,8 +84,9 @@ RunNyAng/
 │   │   └── game-page/             # 메인 인게임 페이지 (HUD, Canvas, Modal 조립)
 │   ├── widgets/                   # 3. 독립적이고 완성도 높은 복합 UI 블록
 │   │   ├── game-canvas/           # 캔버스 뷰포트 위젯
-│   │   ├── hud/                   # 거리, 코인, 최고기록 표시 HUD
+│   │   ├── hud/                   # 거리, 코인, 최고기록, 일시정지 버튼 표시 HUD
 │   │   ├── ready-overlay/         # 게임 시작 전 타이틀 오버레이
+│   │   ├── pause-overlay/         # 게임 일시정지 및 재개 오버레이
 │   │   └── game-over-modal/       # 게임 오버 결과 모달
 │   ├── features/                  # 4. 사용자 인터랙션 & 게임 구동 로직
 │   │   ├── controls/              # 키보드 / 모바일 터치 조작 훅 (useGameControls)
