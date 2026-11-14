@@ -8,6 +8,7 @@ import { GameOverModal } from '../../../widgets/game-over-modal';
 import { StageClearModal } from '../../../widgets/stage-clear-modal';
 import { PauseOverlay } from '../../../widgets/pause-overlay';
 import { MobileDPad } from '../../../widgets/mobile-dpad';
+import { EventBanner } from '../../../widgets/event-banner';
 import './GamePage.css';
 
 export const GamePage: React.FC = () => {
@@ -15,6 +16,7 @@ export const GamePage: React.FC = () => {
     canvasRef,
     gameState,
     scoreData,
+    eventMessage,
     startOrRestartGame,
     resumeGame,
     togglePause,
@@ -51,6 +53,8 @@ export const GamePage: React.FC = () => {
           gameState={gameState}
           onTogglePause={togglePause}
         />
+
+        {gameState === 'PLAYING' && <EventBanner message={eventMessage} />}
 
         <GameCanvas
           canvasRef={canvasRef}

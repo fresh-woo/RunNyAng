@@ -16,8 +16,12 @@ import {
   StageObject,
   drawCampusEnvironment,
   drawStageObjects,
+  getPlayerHitbox,
+  getObjectHitbox,
+  rectsOverlap,
 } from '../../../entities/stage';
 import { loadGameAssets, GameAssets } from '../../../shared/lib/assetLoader';
+import { createEventSystemState, updateGameEvents } from '../../game-events';
 
 const STORAGE_KEY_BEST_TIME = 'runnyang_cau_best_time';
 const STORAGE_KEY_HIGHSCORE = 'runnyang_cau_highscore';
@@ -42,6 +46,7 @@ export const useGameEngine = () => {
     bestTimeSeconds: getStoredBestTime(),
     currentZoneLabel: getZoneAt(0).label,
   }));
+  const [eventMessage, setEventMessage] = useState<string | null>(null);
 
   const inputRef = useRef<MovementInput>({
     moveLeft: false,
@@ -57,6 +62,7 @@ export const useGameEngine = () => {
     coinsCollected: 0,
     startTime: 0,
     lastFrameTime: performance.now(),
+    events: createEventSystemState(),
   });
 
   const assetsRef = useRef<GameAssets | null>(null);
@@ -111,8 +117,10 @@ export const useGameEngine = () => {
       coinsCollected: 0,
       startTime: performance.now(),
       lastFrameTime: performance.now(),
+      events: createEventSystemState(),
     };
     setGameState('PLAYING');
+    setEventMessage(null);
     setScoreData((prev) => ({
       ...prev,
       distance: 0,
@@ -148,23 +156,28 @@ export const useGameEngine = () => {
         // Move player
         updatePlayerMovement(g.player, inputRef.current, deltaTime);
 
+        // Random campus events (spawns extra obstacles into g.objects)
+        const prevMessage = g.events.bannerMessage;
+        g.objects = updateGameEvents(g.events, g.player, g.objects, deltaTime);
+        if (g.events.bannerMessage !== prevMessage) {
+          setEventMessage(g.events.bannerMessage);
+        }
+
         const currentDist = Math.min(STAGE_LENGTH, Math.floor(g.player.worldY));
         const progress = Math.min(100, Math.floor((currentDist / STAGE_LENGTH) * 100));
         // 실시간 경과 시간 (소수점 1자리 초)
         const elapsed = Math.round(((currentTime - g.startTime) / 1000) * 10) / 10;
 
         // Check collisions with stage objects
+        // 화면에 실제로 그려지는 고양이 스프라이트 사각형 vs 투영된 오브젝트 사각형 (AABB)
+        const playerBox = getPlayerHitbox(g.player);
         for (const obj of g.objects) {
           if (obj.collected) continue;
 
-          // Check if object is in player Y range (픽셀 단위 변환)
-          const distDiff = Math.abs(obj.worldY - g.player.worldY) * PIXELS_PER_METER;
-          if (distDiff < (g.player.height + obj.height) / 2) {
-            // Check X collision (AABB)
-            if (
-              g.player.x < obj.x + obj.width &&
-              g.player.x + g.player.width > obj.x
-            ) {
+          // 가까운 오브젝트만 투영해서 검사
+          const isNearby = Math.abs(obj.worldY - g.player.worldY) * PIXELS_PER_METER < 200;
+          if (isNearby) {
+            if (rectsOverlap(playerBox, getObjectHitbox(obj, g.player.worldY))) {
               if (obj.type === 'OBSTACLE') {
                 // 타임어택 모드: 목숨 소진/게임오버 대신 '경직/감속 페널티' 부여
                 obj.collected = true; // 1회 피격 후 통과 처리
@@ -230,6 +243,7 @@ export const useGameEngine = () => {
     canvasRef,
     gameState,
     scoreData,
+    eventMessage,
     startOrRestartGame,
     pauseGame,
     resumeGame,
