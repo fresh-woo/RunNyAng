@@ -1,5 +1,13 @@
 /// <reference types="vite/client" />
 
+interface ImportMetaEnv {
+  readonly VITE_API_BASE_URL?: string;
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
+}
+
 // PNG/image asset imports
 declare module '*.png' {
   const src: string;
@@ -13,4 +21,3 @@ declare module '*.svg' {
   const src: string;
   export default src;
 }
-
