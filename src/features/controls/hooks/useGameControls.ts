@@ -1,13 +1,18 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { MovementInput } from '../../../entities/player/model/physics';
+import { GameState } from '../../../shared/types';
 
 interface UseGameControlsProps {
   onStartOrRestart: () => void;
+  onTogglePause?: () => void;
+  gameState?: GameState;
   isReadyOrEnded: boolean;
 }
 
 export const useGameControls = ({
   onStartOrRestart,
+  onTogglePause,
+  gameState,
   isReadyOrEnded,
 }: UseGameControlsProps) => {
   const [movementInput, setMovementInput] = useState<MovementInput>({
@@ -32,11 +37,25 @@ export const useGameControls = ({
   // Keyboard controls
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // ESC 키로 일시정지 토글 (게임 진행 중 또는 일시정지 중일 때만 동작)
+      if (e.code === 'Escape') {
+        if (gameState === 'PLAYING' || gameState === 'PAUSED') {
+          e.preventDefault();
+          onTogglePause?.();
+          return;
+        }
+      }
+
       if (e.code === 'Space' || e.code === 'Enter') {
         if (isReadyOrEnded) {
           onStartOrRestart();
           return;
         }
+      }
+
+      // 일시정지 중이거나 시작 전/종료 상태일 때는 이동 입력 무시
+      if (gameState === 'PAUSED' || isReadyOrEnded) {
+        return;
       }
 
       if (e.code === 'ArrowLeft' || e.code === 'KeyA') {
@@ -73,10 +92,13 @@ export const useGameControls = ({
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, [onStartOrRestart, isReadyOrEnded, updateInput]);
+  }, [onStartOrRestart, onTogglePause, gameState, isReadyOrEnded, updateInput]);
 
   // Touch handler for mobile (touch left half to go left, touch right half to go right)
   const handleTouchStart = (clientX: number, windowWidth: number) => {
+    if (gameState === 'PAUSED') {
+      return;
+    }
     if (isReadyOrEnded) {
       onStartOrRestart();
       return;

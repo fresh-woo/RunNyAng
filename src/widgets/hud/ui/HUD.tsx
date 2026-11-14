@@ -1,17 +1,24 @@
 import React from 'react';
-import { ScoreData } from '../../../shared/types';
+import { ScoreData, GameState } from '../../../shared/types';
 import './HUD.css';
 import iconChuruUrl from '../../../assets/images/ui/icon_churu.png';
 import catPortraitUrl from '../../../assets/images/cat/cat_portrait.png';
+import btnPauseUrl from '../../../assets/images/ui/btn_pause.png';
+import btnPlayUrl from '../../../assets/images/ui/btn_play.png';
 
 interface HUDProps {
   scoreData: ScoreData;
+  gameState?: GameState;
+  onTogglePause?: () => void;
 }
 
-export const HUD: React.FC<HUDProps> = ({ scoreData }) => {
+export const HUD: React.FC<HUDProps> = ({ scoreData, gameState, onTogglePause }) => {
   const minutes = Math.floor(scoreData.elapsedSeconds / 60);
   const remainingSeconds = (scoreData.elapsedSeconds % 60).toFixed(1);
   const formattedTime = `${String(minutes).padStart(2, '0')}:${remainingSeconds.padStart(4, '0')}`;
+
+  const isPaused = gameState === 'PAUSED';
+  const showPauseButton = onTogglePause && (gameState === 'PLAYING' || isPaused);
 
   return (
     <header className="widget-hud">
@@ -23,6 +30,22 @@ export const HUD: React.FC<HUDProps> = ({ scoreData }) => {
             <img src={iconChuruUrl} alt="츄르" className="hud-churu-icon" />
             {scoreData.coins}개
           </div>
+          {showPauseButton && (
+            <button
+              type="button"
+              className="hud-pause-btn"
+              onClick={onTogglePause}
+              title={isPaused ? '게임 재개 (ESC)' : '일시정지 (ESC)'}
+              aria-label={isPaused ? '게임 재개' : '일시정지'}
+            >
+              <img
+                src={isPaused ? btnPlayUrl : btnPauseUrl}
+                alt={isPaused ? '재개' : '일시정지'}
+                className="hud-pause-btn-img"
+                draggable={false}
+              />
+            </button>
+          )}
         </div>
       </div>
 

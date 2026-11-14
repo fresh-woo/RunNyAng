@@ -58,12 +58,50 @@ export const useGameEngine = () => {
   });
 
   const assetsRef = useRef<GameAssets | null>(null);
+  const pauseStartTimeRef = useRef<number>(0);
 
   const setInput = useCallback((input: MovementInput) => {
     inputRef.current = input;
   }, []);
 
+  const pauseGame = useCallback(() => {
+    if (engineStateRef.current.state === 'PLAYING') {
+      engineStateRef.current.state = 'PAUSED';
+      pauseStartTimeRef.current = performance.now();
+      // 일시정지 시 이전 입력 초기화
+      inputRef.current = {
+        moveLeft: false,
+        moveRight: false,
+        moveUp: false,
+        moveDown: false,
+      };
+      setGameState('PAUSED');
+    }
+  }, []);
+
+  const resumeGame = useCallback(() => {
+    if (engineStateRef.current.state === 'PAUSED') {
+      if (pauseStartTimeRef.current > 0) {
+        const pauseDuration = performance.now() - pauseStartTimeRef.current;
+        engineStateRef.current.startTime += pauseDuration;
+        pauseStartTimeRef.current = 0;
+      }
+      engineStateRef.current.lastFrameTime = performance.now();
+      engineStateRef.current.state = 'PLAYING';
+      setGameState('PLAYING');
+    }
+  }, []);
+
+  const togglePause = useCallback(() => {
+    if (engineStateRef.current.state === 'PLAYING') {
+      pauseGame();
+    } else if (engineStateRef.current.state === 'PAUSED') {
+      resumeGame();
+    }
+  }, [pauseGame, resumeGame]);
+
   const startOrRestartGame = useCallback(() => {
+    pauseStartTimeRef.current = 0;
     engineStateRef.current = {
       state: 'PLAYING',
       player: createInitialPlayer(),
@@ -197,6 +235,9 @@ export const useGameEngine = () => {
     gameState,
     scoreData,
     startOrRestartGame,
+    pauseGame,
+    resumeGame,
+    togglePause,
     setInput,
   };
 };

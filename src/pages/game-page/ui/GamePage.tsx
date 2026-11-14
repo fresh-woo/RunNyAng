@@ -6,6 +6,7 @@ import { GameCanvas } from '../../../widgets/game-canvas';
 import { ReadyOverlay } from '../../../widgets/ready-overlay';
 import { GameOverModal } from '../../../widgets/game-over-modal';
 import { StageClearModal } from '../../../widgets/stage-clear-modal';
+import { PauseOverlay } from '../../../widgets/pause-overlay';
 import { MobileDPad } from '../../../widgets/mobile-dpad';
 import './GamePage.css';
 
@@ -15,6 +16,8 @@ export const GamePage: React.FC = () => {
     gameState,
     scoreData,
     startOrRestartGame,
+    resumeGame,
+    togglePause,
     setInput,
   } = useGameEngine();
 
@@ -30,6 +33,8 @@ export const GamePage: React.FC = () => {
     setMoveDown,
   } = useGameControls({
     onStartOrRestart: startOrRestartGame,
+    onTogglePause: togglePause,
+    gameState,
     isReadyOrEnded,
   });
 
@@ -41,7 +46,11 @@ export const GamePage: React.FC = () => {
   return (
     <main className="game-page-container">
       <div className="game-frame">
-        <HUD scoreData={scoreData} />
+        <HUD
+          scoreData={scoreData}
+          gameState={gameState}
+          onTogglePause={togglePause}
+        />
 
         <GameCanvas
           canvasRef={canvasRef}
@@ -54,6 +63,8 @@ export const GamePage: React.FC = () => {
 
         {gameState === 'READY' && <ReadyOverlay onStart={startOrRestartGame} />}
 
+        {gameState === 'PAUSED' && <PauseOverlay onResume={resumeGame} />}
+
         {gameState === 'GAMEOVER' && (
           <GameOverModal scoreData={scoreData} onRetry={startOrRestartGame} />
         )}
@@ -62,7 +73,7 @@ export const GamePage: React.FC = () => {
           <StageClearModal scoreData={scoreData} onRetry={startOrRestartGame} />
         )}
 
-        {/* 모바일 D-PAD 가상 방향키 (인게임 중에만 표시) */}
+        {/* 모바일 D-PAD 가상 방향키 (인게임 플레이 중에만 표시) */}
         {gameState === 'PLAYING' && (
           <MobileDPad
             onLeft={setMoveLeft}
@@ -73,7 +84,7 @@ export const GamePage: React.FC = () => {
         )}
 
         <footer className="controls-hint-bar">
-          🎮 조작법: [← / →] 좌우 이동 | [↑ / W] 가속 | [↓ / S] 감속 | 모바일: 화면 하단 D-PAD
+          🎮 조작법: [← / →] 좌우 이동 | [↑ / W] 가속 | [↓ / S] 감속 | [ESC] 일시정지 | 모바일: D-PAD
         </footer>
       </div>
     </main>

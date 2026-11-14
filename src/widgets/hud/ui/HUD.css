@@ -6,7 +6,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  z-index: 5;
+  z-index: 15;
   pointer-events: none;
 }
 
@@ -110,10 +110,43 @@
   transition: left 0.1s linear;
 }
 
+.hud-pause-btn {
+  pointer-events: auto;
+  background: transparent;
+  border: none;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: transform 0.1s ease, filter 0.15s ease;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
+}
+
+.hud-pause-btn:hover {
+  transform: scale(1.08);
+  filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.8)) brightness(1.1);
+}
+
+.hud-pause-btn:active {
+  transform: scale(0.92);
+}
+
+.hud-pause-btn-img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  display: block;
+}
+
 @media (max-width: 768px) {
   .widget-hud { left: 8px; right: 8px; top: 8px; }
   .hud-top-row { flex-wrap: wrap; gap: 5px; }
   .hud-stage-title, .hud-timer, .hud-coins { font-size: 0.78rem; padding: 3px 7px; }
   .hud-status-group { gap: 5px; }
   .hud-progress-labels { font-size: 0.65rem; }
+  .hud-pause-btn-img { width: 28px; height: 28px; }
 }
