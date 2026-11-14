@@ -1,0 +1,103 @@
+.ranking-board-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(2, 6, 23, 0.7);
+  padding: 16px;
+}
+
+.ranking-board {
+  width: min(520px, 100%);
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #1e293b;
+  border: 2px solid #334155;
+  border-radius: 16px;
+  padding: 16px 20px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+  text-align: center;
+}
+
+.ranking-board-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ranking-board-header h2 {
+  font-size: 1.5rem;
+  color: #facc15;
+}
+
+.ranking-board-close {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 1.3rem;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.ranking-board-close:hover {
+  color: #f8fafc;
+}
+
+.ranking-board-sub {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin: 2px 0 10px;
+  text-align: left;
+}
+
+.ranking-board-body {
+  overflow-y: auto;
+  min-height: 120px;
+}
+
+.ranking-board-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: #cbd5e1;
+  padding: 32px 0;
+}
+
+.ranking-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.ranking-table th {
+  position: sticky;
+  top: 0;
+  background: #1e293b;
+  color: #94a3b8;
+  font-weight: 600;
+  padding: 6px 4px;
+  border-bottom: 1px solid #334155;
+}
+
+.ranking-table td {
+  padding: 7px 4px;
+  border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+  color: #e2e8f0;
+}
+
+.ranking-table .ranking-nickname {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ranking-table tr.is-me td {
+  background: rgba(56, 189, 248, 0.18);
+  color: #38bdf8;
+  font-weight: 700;
+}
