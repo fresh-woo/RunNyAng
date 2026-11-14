@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { RankingBoard } from '../../ranking-board';
 import { Overlay } from '../../../shared/ui/Overlay/Overlay';
 import { Button } from '../../../shared/ui/Button/Button';
 import catPortraitUrl from '../../../assets/images/cat/cat_portrait.png';
@@ -8,7 +9,10 @@ interface ReadyOverlayProps {
 }
 
 export const ReadyOverlay: React.FC<ReadyOverlayProps> = ({ onStart }) => {
+  const [showRanking, setShowRanking] = useState(false);
+
   return (
+    <>
     <Overlay>
       <img
         src={catPortraitUrl}
@@ -32,7 +36,12 @@ export const ReadyOverlay: React.FC<ReadyOverlayProps> = ({ onStart }) => {
       <Button variant="start" onClick={onStart}>
         출발하기
       </Button>
+      <Button variant="secondary" style={{ marginTop: '16px' }} onClick={() => setShowRanking(true)}>
+        🏆 랭킹 보기
+      </Button>
     </Overlay>
+    {showRanking && <RankingBoard onClose={() => setShowRanking(false)} />}
+    </>
   );
 };
 

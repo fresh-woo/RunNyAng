@@ -37,6 +37,12 @@ export const useGameControls = ({
   // Keyboard controls
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // 닉네임 입력 등 텍스트 입력 중에는 게임 단축키를 막는다
+      const target = e.target as HTMLElement | null;
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+        return;
+      }
+
       // ESC 키로 일시정지 토글 (게임 진행 중 또는 일시정지 중일 때만 동작)
       if (e.code === 'Escape') {
         if (gameState === 'PLAYING' || gameState === 'PAUSED') {

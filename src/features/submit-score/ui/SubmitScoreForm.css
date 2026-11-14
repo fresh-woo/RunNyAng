@@ -1,0 +1,54 @@
+.submit-score-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.submit-score-row {
+  display: flex;
+  gap: 8px;
+}
+
+.submit-score-input {
+  width: 180px;
+  padding: 10px 14px;
+  border-radius: 9999px;
+  border: 2px solid #334155;
+  background: #0f172a;
+  color: #f8fafc;
+  font-size: 1rem;
+  outline: none;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.submit-score-input:focus {
+  border-color: #38bdf8;
+}
+
+.submit-score-button {
+  padding: 10px 18px;
+  font-size: 1rem;
+}
+
+.submit-score-button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.submit-score-message {
+  font-size: 0.9rem;
+  margin-bottom: 0;
+}
+
+.submit-score-message--ok {
+  color: #4ade80;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.submit-score-message--error {
+  color: #f87171;
+}
