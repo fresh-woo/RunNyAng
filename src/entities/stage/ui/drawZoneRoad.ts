@@ -213,7 +213,7 @@ const drawRoadThemeDetails = (ctx: CanvasRenderingContext2D, s: RoadSegment): vo
   switch (s.theme) {
     case 'GATE_ENTRANCE': {
       // 1. 0~25m 구간: 큼직한 흰 횡단보도 (0_100.png)
-      if (m >= 8 && m <= 24) {
+      if (m >= 8 && m <= 14) {
         ctx.fillStyle = '#f8fafc';
         const barCount = 7;
         for (let b = 0; b < barCount; b++) {
@@ -245,10 +245,6 @@ const drawRoadThemeDetails = (ctx: CanvasRenderingContext2D, s: RoadSegment): vo
         ctx.stroke();
       }
 
-      // 3. 32m, 68m 부근: 바닥 흰 화살표 (0_100.png)
-      if (Math.floor(m) === 32 || Math.floor(m) === 68) {
-        drawRoadArrow(ctx, centerX0 - 35 * s.pLeft0.scale, s.pLeft0.sy, s.pLeft0.scale);
-      }
       break;
     }
 
@@ -304,15 +300,6 @@ const drawRoadThemeDetails = (ctx: CanvasRenderingContext2D, s: RoadSegment): vo
       ctx.lineTo(s.pRight1.sx - 12 * s.pRight1.scale, s.pRight1.sy);
       ctx.stroke();
 
-      // 2. 210m, 260m 노면 흰 글씨 '천천히' (200_300.png)
-      if (Math.floor(m) === 210 || Math.floor(m) === 265) {
-        ctx.save();
-        ctx.fillStyle = '#ffffff';
-        ctx.font = `bold ${Math.round(20 * s.pLeft0.scale)}px sans-serif`;
-        ctx.textAlign = 'center';
-        ctx.fillText('천 천 히', centerX0, s.pLeft0.sy - 4);
-        ctx.restore();
-      }
       break;
     }
 
@@ -501,7 +488,7 @@ const drawRoadArrow = (
 ): void => {
   ctx.save();
   ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
-  const s = scale * 14;
+  const s = scale * 100;
 
   ctx.beginPath();
   ctx.moveTo(x, y - s * 1.5);

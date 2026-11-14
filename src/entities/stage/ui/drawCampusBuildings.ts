@@ -36,17 +36,15 @@ export const drawCampusBuildings = (
       case 'GATE_ENTRANCE': {
         // [0 ~ 100m] 0_100.png: 정문 안 진입로
         // 왼쪽: 102관 약학대학 R&D센터 유리 커튼월 현대식 건물 (앞면+오른쪽옆면+지붕)
-        if (m % 16 === 0) {
-          draw3DModernGlassBuilding(
+        draw3DModernGlassBuilding(
             ctx,
-            pLeft.sx - 80 * pLeft.scale,
+            pLeft.sx - 600 * pLeft.scale,
             pLeft.sy,
-            120 * pLeft.scale,
-            150 * pLeft.scale,
+            480 * pLeft.scale,
+            6000 * pLeft.scale,
             pLeft.scale,
             '102관 R&D센터'
           );
-        }
 
         // 왼쪽 인도 볼라드 (노란색/검은색 볼라드)
         drawBollard(ctx, pLeft.sx + 10 * pLeft.scale, pLeft.sy, pLeft.scale, (m % 16 === 0) ? '#eab308' : '#0f172a');
@@ -62,16 +60,14 @@ export const drawCampusBuildings = (
       case 'BETWEEN_BUILDINGS': {
         // [100 ~ 160m] 100_160.png: 건물 사이 보행로
         // 왼쪽: 짙은 돌벽 건물 모퉁이와 그늘진 아케이드
-        if (m % 16 === 0) {
-          draw3DStoneBuilding(
-            ctx,
-            pLeft.sx - 70 * pLeft.scale,
-            pLeft.sy,
-            110 * pLeft.scale,
-            130 * pLeft.scale,
-            pLeft.scale
-          );
-        }
+        draw3DStoneBuilding(
+          ctx,
+          pLeft.sx - 600 * pLeft.scale,
+          pLeft.sy,
+          440 * pLeft.scale,
+          520 * pLeft.scale,
+          pLeft.scale
+        );
         // 왼쪽: 파란 표지 기둥 (100_160.png)
         if (m === 112 || m === 136) {
           drawBlueSignPole(ctx, pLeft.sx + 5 * pLeft.scale, pLeft.sy, pLeft.scale);
