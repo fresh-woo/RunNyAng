@@ -177,7 +177,13 @@ export const useGameEngine = () => {
           // 가까운 오브젝트만 투영해서 검사
           const isNearby = Math.abs(obj.worldY - g.player.worldY) * PIXELS_PER_METER < 200;
           if (isNearby) {
-            if (rectsOverlap(playerBox, getObjectHitbox(obj, g.player.worldY))) {
+            // 결승선은 폭 전체를 가로지르는 선이므로, 사각형 겹침이 아니라 도달 여부로 판정
+            // (worldY 가 STAGE_LENGTH 에서 멈추기 때문에 사각형은 경계에서 맞닿기만 하고 겹치지 않음)
+            const hit =
+              obj.type === 'FINISH_LINE'
+                ? g.player.worldY >= obj.worldY
+                : rectsOverlap(playerBox, getObjectHitbox(obj, g.player.worldY));
+            if (hit) {
               if (obj.type === 'OBSTACLE') {
                 // 타임어택 모드: 목숨 소진/게임오버 대신 '경직/감속 페널티' 부여
                 obj.collected = true; // 1회 피격 후 통과 처리
