@@ -49,7 +49,7 @@ export const HUD: React.FC<HUDProps> = ({ scoreData, gameState, onTogglePause })
         </div>
       </div>
 
-      {gameState !== 'CLEAR' && (
+      {(gameState === 'PLAYING' || isPaused) && (
       <div className="hud-progress-container">
         <div className="hud-progress-labels">
           <span>정문</span>
