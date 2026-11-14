@@ -23,7 +23,7 @@ export const HUD: React.FC<HUDProps> = ({ scoreData, gameState, onTogglePause })
   return (
     <header className="widget-hud">
       <div className="hud-top-row">
-        <div className="hud-stage-title">📍 중앙대 정문 ➔ 310관</div>
+        <div className="hud-stage-title">📍 {scoreData.currentZoneLabel || '중앙대 정문 ➔ 310관'}</div>
         <div className="hud-status-group">
           <div className="hud-timer">⏱️ {formattedTime}</div>
           <div className="hud-coins">

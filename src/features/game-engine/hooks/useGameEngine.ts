@@ -1,17 +1,18 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import {
   STAGE_LENGTH,
+  PIXELS_PER_METER,
   OBSTACLE_STUN_DURATION_MS,
 } from '../../../shared/config/gameConfig';
 import { GameState, ScoreData } from '../../../shared/types';
 import {
   createInitialPlayer,
   updatePlayerMovement,
-  drawPlayer,
   MovementInput,
 } from '../../../entities/player';
 import {
   getStage1Objects,
+  getZoneAt,
   StageObject,
   drawCampusEnvironment,
   drawStageObjects,
@@ -39,6 +40,7 @@ export const useGameEngine = () => {
     highScore: parseInt(localStorage.getItem(STORAGE_KEY_HIGHSCORE) || '0', 10),
     elapsedSeconds: 0,
     bestTimeSeconds: getStoredBestTime(),
+    currentZoneLabel: getZoneAt(0).label,
   }));
 
   const inputRef = useRef<MovementInput>({
@@ -118,6 +120,7 @@ export const useGameEngine = () => {
       coins: 0,
       elapsedSeconds: 0,
       bestTimeSeconds: getStoredBestTime(),
+      currentZoneLabel: getZoneAt(0).label,
     }));
   }, []);
 
@@ -145,7 +148,7 @@ export const useGameEngine = () => {
         // Move player
         updatePlayerMovement(g.player, inputRef.current, deltaTime);
 
-        const currentDist = Math.floor(g.player.worldY);
+        const currentDist = Math.min(STAGE_LENGTH, Math.floor(g.player.worldY));
         const progress = Math.min(100, Math.floor((currentDist / STAGE_LENGTH) * 100));
         // 실시간 경과 시간 (소수점 1자리 초)
         const elapsed = Math.round(((currentTime - g.startTime) / 1000) * 10) / 10;
@@ -154,8 +157,8 @@ export const useGameEngine = () => {
         for (const obj of g.objects) {
           if (obj.collected) continue;
 
-          // Check if object is in player Y range
-          const distDiff = Math.abs(obj.worldY - g.player.worldY);
+          // Check if object is in player Y range (픽셀 단위 변환)
+          const distDiff = Math.abs(obj.worldY - g.player.worldY) * PIXELS_PER_METER;
           if (distDiff < (g.player.height + obj.height) / 2) {
             // Check X collision (AABB)
             if (
@@ -206,22 +209,15 @@ export const useGameEngine = () => {
           distance: currentDist,
           progressPercent: progress,
           elapsedSeconds: elapsed,
+          currentZoneLabel: getZoneAt(currentDist).label,
         }));
       }
 
-      // Draw Campus Environment
+      // Draw Campus Environment (Sky, 3/4 Perspective Road, Buildings, Greenery)
       drawCampusEnvironment(ctx, g.player.worldY);
 
-      // Draw Stage Objects (Landmarks, Obstacles, Finish Line)
-      drawStageObjects(ctx, g.objects, g.player.worldY, g.player.screenY, assetsRef.current);
-
-      // Draw Player Cat (3-frame running sprite)
-      drawPlayer(
-        ctx,
-        g.player,
-        assetsRef.current?.catRunFrames,
-        assetsRef.current?.catHurt
-      );
+      // Draw Stage Objects & Player Cat with Depth Sorting
+      drawStageObjects(ctx, g.objects, g.player, assetsRef.current);
 
       animationFrameId = requestAnimationFrame(gameLoop);
     };
