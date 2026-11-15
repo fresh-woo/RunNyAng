@@ -37,6 +37,8 @@ export const EVENT_TUNING = {
   /** 이벤트 장애물이 플레이어 앞 몇 m 지점에 나타나는지 */
   spawnAheadMinM: 8,
   spawnAheadMaxM: 12,
+  /** 라바콘 줄/촬영팀은 맵 장애물과 앞뒤로 이만큼(m) 떨어진 곳에 나타남 */
+  clearFromStageObstacleM: 4,
   /** 플레이어 뒤로 이만큼(m) 지나간 이벤트 장애물은 정리 */
   cleanupBehindM: 10,
 };

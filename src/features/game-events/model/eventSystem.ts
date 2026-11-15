@@ -87,6 +87,27 @@ const makeStudent = (s: EventSystemState, x: number, worldY: number, name: strin
 const spawnAheadY = (player: Player) =>
   player.worldY + rand(EVENT_TUNING.spawnAheadMinM, EVENT_TUNING.spawnAheadMaxM);
 
+/**
+ * 무리로 나오는 이벤트(공사 라바콘 줄, ACT 촬영팀)가 맵에 깔린 장애물과 같은 줄에
+ * 겹쳐 길이 막히지 않도록, 맵 장애물에서 앞뒤로 떨어진 위치를 고른다.
+ * 맵 장애물은 판마다 랜덤 배치라 위치가 고정이 아니므로 그때그때 확인한다.
+ */
+const spawnClearY = (player: Player, objects: StageObject[]) => {
+  const near = (y: number) =>
+    objects.some(
+      (o) =>
+        o.type === 'OBSTACLE' &&
+        !(o as EventObstacle).eventSpawned &&
+        !o.collected &&
+        Math.abs(o.worldY - y) < EVENT_TUNING.clearFromStageObstacleM
+    );
+  let y = spawnAheadY(player);
+  for (let t = 0; t < 12 && near(y); t++) {
+    y = player.worldY + rand(EVENT_TUNING.spawnAheadMinM, EVENT_TUNING.spawnAheadMaxM + 6);
+  }
+  return y;
+};
+
 const spawnCrowdPerson = (s: EventSystemState, player: Player, objects: StageObject[]) => {
   const x = rand(PLAY_MIN_X, PLAY_MAX_X - STUDENT_SIZE.width);
   objects.push(makeStudent(s, x, spawnAheadY(player), '몰려온 학생'));
@@ -125,7 +146,7 @@ const triggerEvent = (
       const rowWidth =
         CONSTRUCTION.coneCount * CONE_SIZE.width + (CONSTRUCTION.coneCount - 1) * CONSTRUCTION.gapPx;
       const startX = rand(PLAY_MIN_X, PLAY_MAX_X - rowWidth);
-      const worldY = spawnAheadY(player);
+      const worldY = spawnClearY(player, objects);
       for (let i = 0; i < CONSTRUCTION.coneCount; i++) {
         objects.push({
           id: `evt_${s.nextId++}`,
@@ -146,7 +167,7 @@ const triggerEvent = (
         PLAY_MIN_X + ACT_FILMING.spreadXPx / 2,
         PLAY_MAX_X - ACT_FILMING.spreadXPx / 2 - STUDENT_SIZE.width
       );
-      const centerY = spawnAheadY(player);
+      const centerY = spawnClearY(player, objects);
       for (let i = 0; i < ACT_FILMING.peopleCount; i++) {
         const x = centerX + rand(-0.5, 0.5) * ACT_FILMING.spreadXPx;
         const y = centerY + rand(-0.5, 0.5) * ACT_FILMING.spreadYM;

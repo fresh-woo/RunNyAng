@@ -6,7 +6,7 @@ import {
   CAMPUS_GATE_M,
 } from '../../../shared/config/gameConfig';
 import { project, ProjectedPoint } from '../lib/projection';
-import { getZoneAt } from '../model/cauStage1';
+import { getZoneAt, CITY_CROSSWALKS } from '../model/cauStage1';
 import { StageZoneTheme } from '../model/types';
 
 interface RoadSegment {
@@ -513,16 +513,6 @@ const drawSidewalkQuad = (
   ctx.closePath();
   ctx.fill();
 };
-
-/** 횡단보도 위치 (흑석역 앞 / 병원 앞 거리 구간). [시작m, 끝m] */
-const CITY_CROSSWALKS: Array<[number, number]> = [
-  [14, 19],
-  [138, 143],
-  [266, 271],
-  [281, 286],
-  [440, 445],
-  [532, 537],
-];
 
 /** 흑석역 앞 붉은 포장(버스 정차/주정차 금지) 구간 (0_270.png) */
 const RED_PAVING: Array<[number, number]> = [
