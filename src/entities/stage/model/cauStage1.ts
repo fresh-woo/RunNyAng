@@ -50,14 +50,14 @@ export const cauCampusZones: CampusZone[] = [
     fromM: 370,
     toM: 450,
     theme: 'BUILDING_SLOPE',
-    label: '건물 옆 비탈길',
+    label: '도서관 옆 비탈길',
     refImage: '370_450.png',
   },
   {
     fromM: 450,
     toM: 500,
     theme: 'BUILDING_310',
-    label: '310관 앞 마지막 직선',
+    label: '310관 앞',
     refImage: '450_500.png',
   },
 ];
@@ -106,7 +106,6 @@ export const cauStage1Data: StageData = {
     { id: 'item_2_2', name: '츄르', worldY: 165, x: 480, width: 24, height: 24, type: 'ITEM', subType: 'CHURU' },
     // [180m Landmark] 빼빼로 광장 (중앙 광장)
     { id: 'lm_2', name: '🌳 빼빼로 광장', worldY: 180, x: ROAD_LEFT - 30, width: 85, height: 45, type: 'LANDMARK' },
-    { id: 'obs_2_2', name: '광장 화단 경계석', worldY: 190, x: 380, width: 50, height: 32, type: 'OBSTACLE', color: '#0284c7' },
 
     // ----------------------------------------------------
     // [구간 4: 200m ~ 300m] 캠퍼스 오르막 차도 (200_300.png)
