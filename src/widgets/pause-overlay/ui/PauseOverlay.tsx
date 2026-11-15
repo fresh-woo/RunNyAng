@@ -32,7 +32,7 @@ export const PauseOverlay: React.FC<PauseOverlayProps> = ({ onResume, onReturnTo
             />
           </button>
           <span className="pause-key-hint">재개 버튼을 누르거나 [ESC]를 누르면 계속 달립니다</span>
-          <Button type="button" variant="exit" className="pause-return-btn" onClick={onReturnToStart} title="처음 화면으로 돌아가기">
+          <Button type="button" variant="home" className="pause-return-btn" onClick={onReturnToStart} title="처음 화면으로 돌아가기">
             처음으로 돌아가기
           </Button>
         </div>
