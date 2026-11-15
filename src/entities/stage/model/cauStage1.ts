@@ -22,7 +22,7 @@ export const cauCampusZones: CampusZone[] = [
     fromM: 160,
     toM: 200,
     theme: 'TREE_SQUARE',
-    label: '나무 광장',
+    label: '빼빼로 광장',
     refImage: '160_200.png',
   },
   {
@@ -104,7 +104,7 @@ export const cauStage1Data: StageData = {
     // [구간 3: 160m ~ 200m] 빼빼로 광장 (160_200.png)
     // ----------------------------------------------------
     { id: 'item_2_2', name: '츄르', worldY: 165, x: 480, width: 24, height: 24, type: 'ITEM', subType: 'CHURU' },
-    // [180m Landmark] 나무 광장 (중앙 광장)
+    // [180m Landmark] 빼빼로 광장 (중앙 광장)
     { id: 'lm_2', name: '🌳 빼빼로 광장', worldY: 180, x: ROAD_LEFT - 30, width: 85, height: 45, type: 'LANDMARK' },
     { id: 'obs_2_2', name: '광장 화단 경계석', worldY: 190, x: 380, width: 50, height: 32, type: 'OBSTACLE', color: '#0284c7' },
 

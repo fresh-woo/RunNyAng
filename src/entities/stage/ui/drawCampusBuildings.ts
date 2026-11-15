@@ -80,7 +80,7 @@ export const drawCampusBuildings = (
       }
 
       case 'TREE_SQUARE': {
-        // [160 ~ 200m] 160_200.png: 나무 광장
+        // [160 ~ 200m] 160_200.png: 빼빼로 광장
         // 왼쪽/오른쪽: 키 큰 활엽수 빽빽, 둥근 덤불, 낮은 계단 금속 난간
         drawCampusTree(ctx, pLeft.sx - 40 * pLeft.scale, pLeft.sy, pLeft.scale, 'TALL');
         drawRoundBush(ctx, pLeft.sx - 10 * pLeft.scale, pLeft.sy, pLeft.scale);

@@ -16,6 +16,7 @@ interface RoadSegment {
   pLeft1: ProjectedPoint;
   pRight1: ProjectedPoint;
   worldM: number; // 실제 월드 미터
+  cell: number; // 월드 기준 세그먼트 번호 (worldM / stepM, 정수) — 노면 무늬 교차용
   theme: StageZoneTheme;
   fadeAlpha: number; // 구간 전환 페이드 알파 (0.0 ~ 1.0)
   prevTheme?: StageZoneTheme;
@@ -35,16 +36,21 @@ export const drawZoneRoad = (
   ctx.fillRect(0, 150, CANVAS_WIDTH, CANVAS_HEIGHT - 150);
 
   // 2. 도로 및 인도 세그먼트 생성 (플레이어 전방 약 50m ~ 후방 10m)
-  // 1.5m 단위로 촘촘하게 쿼드 메쉬를 분할하여 부드러운 원근 투영 및 곡선, 페이드 구현
-  const stepM = 1.5;
+  // 세그먼트 경계를 '월드 미터 격자'에 고정해야 노면 무늬가 플레이어 속도 그대로 다가온다.
+  // (예전처럼 플레이어 기준 상대 위치에 고정하면 경계는 화면에 멈춰 있고 색만 바뀌어서,
+  //  세그먼트보다 촘촘한 무늬는 에일리어싱으로 실제보다 몇 배 빠르게/거꾸로 흐르는 것처럼 보임)
+  const stepM = 0.5;
   const minRelM = -10;
   const maxRelM = 52;
   const segments: RoadSegment[] = [];
 
-  for (let m = minRelM; m < maxRelM; m += stepM) {
-    const m0 = m;
-    const m1 = m + stepM;
-    const wM = playerWorldY + m0;
+  const firstCell = Math.floor((playerWorldY + minRelM) / stepM);
+  const lastCell = Math.ceil((playerWorldY + maxRelM) / stepM);
+
+  for (let cell = firstCell; cell < lastCell; cell++) {
+    const wM = cell * stepM;
+    const m0 = wM - playerWorldY;
+    const m1 = m0 + stepM;
 
     const pLeft0 = project(ROAD_LEFT, m0);
     const pRight0 = project(ROAD_RIGHT, m0);
@@ -76,6 +82,7 @@ export const drawZoneRoad = (
       pLeft1,
       pRight1,
       worldM: wM,
+      cell,
       theme: currentZone.theme,
       fadeAlpha,
       prevTheme,
@@ -125,7 +132,7 @@ export const drawZoneRoad = (
     const s = segments[i];
 
     // 테마별 기본 아스팔트/보도블록 바닥색
-    const surfaceColor = getRoadSurfaceColor(s.theme, s.worldM);
+    const surfaceColor = getRoadSurfaceColor(s.theme, s.cell);
 
     ctx.fillStyle = surfaceColor;
     ctx.beginPath();
@@ -169,23 +176,25 @@ export const drawZoneRoad = (
 /**
  * 테마별 메인 도로 기본 표면 색상
  */
-const getRoadSurfaceColor = (theme: StageZoneTheme, worldM: number): string => {
+const getRoadSurfaceColor = (theme: StageZoneTheme, cell: number): string => {
+  // 세그먼트(0.5m) 하나씩 번갈아 칠함. 음수 cell(출발 직후 후방)도 0/1이 되도록 보정
+  const even = ((cell % 2) + 2) % 2 === 0;
   switch (theme) {
     case 'GATE_ENTRANCE':
       // 짙은 흑색 아스팔트 (0_100.png)
       return '#334155';
     case 'BETWEEN_BUILDINGS':
       // 차도 끝나고 회색 보도블록 보행로 (100_160.png)
-      return (Math.floor(worldM * 2) % 2 === 0) ? '#64748b' : '#475569';
+      return even ? '#64748b' : '#475569';
     case 'TREE_SQUARE':
       // 베이지/회색 격자 보도블록 광장 (160_200.png)
-      return (Math.floor(worldM * 2) % 2 === 0) ? '#d6d3d1' : '#cbd5e1';
+      return even ? '#d6d3d1' : '#cbd5e1';
     case 'CAMPUS_UPHILL':
       // 캠퍼스 오르막 아스팔트 (200_300.png)
       return '#384252';
     case 'LIBRARY_STAIRS':
       // 도서관 긴 계단 (300_340.png: 디딤면과 챌면 교차)
-      return (Math.floor(worldM * 3) % 2 === 0) ? '#cbd5e1' : '#94a3b8';
+      return even ? '#cbd5e1' : '#94a3b8';
     case 'FOREST_SLOPE':
       // 숲길 어두운 아스팔트 (340_370.png)
       return '#283344';
@@ -194,7 +203,7 @@ const getRoadSurfaceColor = (theme: StageZoneTheme, worldM: number): string => {
       return '#334155';
     case 'BUILDING_310':
       // 310관 앞 붉은 벽돌 보도 직선로 (450_500.png)
-      return (Math.floor(worldM * 3) % 2 === 0) ? '#991b1b' : '#7f1d1d';
+      return even ? '#991b1b' : '#7f1d1d';
     default:
       return '#334155';
   }
@@ -281,7 +290,7 @@ const drawRoadThemeDetails = (ctx: CanvasRenderingContext2D, s: RoadSegment): vo
 
     case 'CAMPUS_UPHILL': {
       // 1. 노란 중앙 점선 및 양쪽 흰 가장자리선 (200_300.png)
-      if (Math.floor(m * 1.5) % 2 === 0) {
+      if (Math.floor(s.cell / 2) % 2 === 0) { // 1m 칠하고 1m 비움
         ctx.strokeStyle = '#facc15';
         ctx.lineWidth = Math.max(2, 3.5 * s.pLeft0.scale);
         ctx.beginPath();
@@ -323,7 +332,8 @@ const drawRoadThemeDetails = (ctx: CanvasRenderingContext2D, s: RoadSegment): vo
           ctx.arc(bx, (s.pLeft0.sy + s.pLeft1.sy) / 2, 2.5 * s.pLeft0.scale, 0, Math.PI * 2);
           ctx.fill();
         }
-      } else {
+      } else if (s.cell % 2 === 0) {
+        // 계단 한 단 = 디딤면 0.5m + 챌면 0.5m. 각 단의 시작에만 모서리 선을 그림
         // 계단 코(Nosing) 하이라이트 & 챌면 그림자
         ctx.strokeStyle = '#f1f5f9'; // 디딤판 모서리 흰색 라인
         ctx.lineWidth = Math.max(1, 2 * s.pLeft0.scale);
