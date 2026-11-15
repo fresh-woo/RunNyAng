@@ -20,8 +20,11 @@ export const LATERAL_SPEED = 6.0; // 좌우 회피 속도 (px/프레임)
 // 미터 당 픽셀 수 (1m = 10px, 500m = 5,000px 트랙)
 export const PIXELS_PER_METER = 60;
 
-// 중앙대 정문에서 310관(100주년 기념관)까지의 총 거리 (500m)
-export const STAGE_LENGTH = 500;
+// 흑석역 앞 출발 -> 중앙대 병원 앞 -> 정문 -> 310관(100주년 기념관)까지의 총 거리 (1040m)
+// 0~540m: 학교 밖 거리 구간 (흑석역 앞, 중앙대 병원 앞)
+// 540m~: 중앙대 정문 안 캠퍼스 구간 (예전 0~500m 맵을 540m 뒤로 민 것)
+export const CAMPUS_GATE_M = 540;
+export const STAGE_LENGTH = CAMPUS_GATE_M + 500;
 
 // Obstacle collision penalty configuration
 export const OBSTACLE_STUN_DURATION_MS = 1000; // 충돌 시 경직/감속 지속 시간 (ms)

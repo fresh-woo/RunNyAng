@@ -3,6 +3,7 @@ import {
   CANVAS_HEIGHT,
   ROAD_LEFT,
   ROAD_RIGHT,
+  CAMPUS_GATE_M,
 } from '../../../shared/config/gameConfig';
 import { project, ProjectedPoint } from '../lib/projection';
 import { getZoneAt } from '../model/cauStage1';
@@ -188,6 +189,12 @@ const getRoadSurfaceColor = (theme: StageZoneTheme, cell: number): string => {
   // 세그먼트(0.5m) 하나씩 번갈아 칠함. 음수 cell(출발 직후 후방)도 0/1이 되도록 보정
   const even = ((cell % 2) + 2) % 2 === 0;
   switch (theme) {
+    case 'HEUKSEOK_STATION':
+      // 흑석역 앞 시내 아스팔트 (0_270.png)
+      return '#4b5563';
+    case 'CAU_HOSPITAL':
+      // 병원 앞 2차로 아스팔트 (270_510.png)
+      return '#475061';
     case 'GATE_ENTRANCE':
       // 짙은 흑색 아스팔트 (0_100.png)
       return '#334155';
@@ -228,9 +235,15 @@ const drawRoadThemeDetails = (ctx: CanvasRenderingContext2D, s: RoadSegment): vo
   const rWidth1 = s.pRight1.sx - s.pLeft1.sx;
 
   switch (s.theme) {
+    case 'HEUKSEOK_STATION':
+    case 'CAU_HOSPITAL': {
+      drawCityStreetMarkings(ctx, s);
+      break;
+    }
+
     case 'GATE_ENTRANCE': {
-      // 1. 0~25m 구간: 큼직한 흰 횡단보도 (0_100.png)
-      if (m >= 8 && m <= 14) {
+      // 1. 정문 지나 8~14m: 큼직한 흰 횡단보도 (0_100.png)
+      if (m >= CAMPUS_GATE_M + 8 && m <= CAMPUS_GATE_M + 14) {
         ctx.fillStyle = '#f8fafc';
         const barCount = 7;
         for (let b = 0; b < barCount; b++) {
@@ -252,8 +265,8 @@ const drawRoadThemeDetails = (ctx: CanvasRenderingContext2D, s: RoadSegment): vo
         }
       }
 
-      // 2. 25~100m 구간: 노란 중앙 실선
-      if (m > 24) {
+      // 2. 정문 지나 24m부터: 노란 중앙 실선
+      if (m > CAMPUS_GATE_M + 24) {
         ctx.strokeStyle = '#facc15'; // 중앙선 노란색
         ctx.lineWidth = Math.max(2, 4 * s.pLeft0.scale);
         ctx.beginPath();
@@ -322,8 +335,8 @@ const drawRoadThemeDetails = (ctx: CanvasRenderingContext2D, s: RoadSegment): vo
 
     case 'LIBRARY_STAIRS': {
       // 헐떡고개 긴 계단 단차 줄무늬 (300_340.png)
-      // 300m 입구: 노란 점자블록 띠
-      if (m >= 300 && m <= 304) {
+      // 계단 입구(정문 지나 300m): 노란 점자블록 띠
+      if (m >= CAMPUS_GATE_M + 300 && m <= CAMPUS_GATE_M + 304) {
         ctx.fillStyle = '#eab308';
         ctx.beginPath();
         ctx.moveTo(s.pLeft0.sx, s.pLeft0.sy);
@@ -459,6 +472,12 @@ const drawSidewalkQuad = (
   let fillColor = '#64748b';
 
   switch (theme) {
+    case 'HEUKSEOK_STATION':
+      fillColor = side === 'LEFT' ? '#9ca3af' : '#b9634f'; // 왼쪽 회색 보도, 오른쪽 붉은 보도블록 (0_270.png)
+      break;
+    case 'CAU_HOSPITAL':
+      fillColor = side === 'LEFT' ? '#a8a29e' : '#b8b2aa'; // 양쪽 회색 보도블록 (270_510.png)
+      break;
     case 'GATE_ENTRANCE':
       fillColor = side === 'LEFT' ? '#94a3b8' : '#15803d'; // 왼쪽 회색 보도블록, 오른쪽 잔디밭 (0_100.png)
       break;
@@ -493,4 +512,110 @@ const drawSidewalkQuad = (
   ctx.lineTo(x3, y3);
   ctx.closePath();
   ctx.fill();
+};
+
+/** 횡단보도 위치 (흑석역 앞 / 병원 앞 거리 구간). [시작m, 끝m] */
+const CITY_CROSSWALKS: Array<[number, number]> = [
+  [14, 19],
+  [138, 143],
+  [266, 271],
+  [281, 286],
+  [440, 445],
+  [532, 537],
+];
+
+/** 흑석역 앞 붉은 포장(버스 정차/주정차 금지) 구간 (0_270.png) */
+const RED_PAVING: Array<[number, number]> = [
+  [24, 40],
+  [196, 212],
+];
+
+/** 노란 지그재그 대신 노면 노란 사각 띠 (서행 표시, 0_270.png) */
+const YELLOW_SLOW_BARS: Array<[number, number]> = [
+  [44, 46],
+  [216, 218],
+];
+
+const inRanges = (m: number, ranges: Array<[number, number]>) =>
+  ranges.some(([a, b]) => m >= a && m < b);
+
+/** 도로 폭 비율 [f0, f1] 띠를 한 세그먼트만큼 칠한다 */
+const fillLaneBand = (ctx: CanvasRenderingContext2D, s: RoadSegment, f0: number, f1: number) => {
+  const w0 = s.pRight0.sx - s.pLeft0.sx;
+  const w1 = s.pRight1.sx - s.pLeft1.sx;
+  ctx.beginPath();
+  ctx.moveTo(s.pLeft0.sx + w0 * f0, s.pLeft0.sy);
+  ctx.lineTo(s.pLeft0.sx + w0 * f1, s.pLeft0.sy);
+  ctx.lineTo(s.pLeft1.sx + w1 * f1, s.pLeft1.sy);
+  ctx.lineTo(s.pLeft1.sx + w1 * f0, s.pLeft1.sy);
+  ctx.closePath();
+  ctx.fill();
+};
+
+/** 도로 폭 비율 f 위치에 세로 선 한 조각 */
+const strokeLaneLine = (ctx: CanvasRenderingContext2D, s: RoadSegment, f: number) => {
+  const w0 = s.pRight0.sx - s.pLeft0.sx;
+  const w1 = s.pRight1.sx - s.pLeft1.sx;
+  ctx.beginPath();
+  ctx.moveTo(s.pLeft0.sx + w0 * f, s.pLeft0.sy);
+  ctx.lineTo(s.pLeft1.sx + w1 * f, s.pLeft1.sy);
+  ctx.stroke();
+};
+
+/**
+ * 시내 거리 노면 표시 (흑석역 앞, 중앙대 병원 앞)
+ * - 노란 중앙선(흑석역 앞은 겹선), 흰 차선 점선, 횡단보도, 붉은 포장, 노란 서행 띠
+ */
+const drawCityStreetMarkings = (ctx: CanvasRenderingContext2D, s: RoadSegment): void => {
+  const m = s.worldM;
+  const sc = s.pLeft0.scale;
+
+  if (s.theme === 'HEUKSEOK_STATION' && inRanges(m, RED_PAVING)) {
+    ctx.fillStyle = '#b4534b';
+    fillLaneBand(ctx, s, 0.04, 0.48);
+  }
+
+  if (inRanges(m, CITY_CROSSWALKS)) {
+    // 흰 횡단보도 줄무늬 (도로 폭 방향으로 늘어선 막대)
+    ctx.fillStyle = '#f8fafc';
+    const bars = 9;
+    for (let b = 0; b < bars; b++) {
+      const f0 = (b + 0.2) / bars;
+      fillLaneBand(ctx, s, f0, f0 + 0.55 / bars);
+    }
+    return;
+  }
+
+  if (s.theme === 'HEUKSEOK_STATION' && inRanges(m, YELLOW_SLOW_BARS)) {
+    ctx.fillStyle = '#facc15';
+    const bars = 8;
+    for (let b = 0; b < bars; b++) {
+      const f0 = (b + 0.25) / bars;
+      fillLaneBand(ctx, s, f0, f0 + 0.5 / bars);
+    }
+  }
+
+  // 노란 중앙선
+  ctx.strokeStyle = '#facc15';
+  ctx.lineWidth = Math.max(2, 3.5 * sc);
+  if (s.theme === 'HEUKSEOK_STATION') {
+    strokeLaneLine(ctx, s, 0.49);
+    strokeLaneLine(ctx, s, 0.515);
+  } else {
+    strokeLaneLine(ctx, s, 0.5);
+  }
+
+  // 흰 차선 점선 (2m 칠하고 2m 비움)
+  if (Math.floor(s.cell / 4) % 2 === 0) {
+    ctx.strokeStyle = '#f1f5f9';
+    ctx.lineWidth = Math.max(2, 3 * sc);
+    strokeLaneLine(ctx, s, 0.25);
+    strokeLaneLine(ctx, s, 0.75);
+  }
+
+  // 양쪽 가장자리 노란 주정차 금지선 (0_270.png 오른쪽 노란 실선)
+  ctx.strokeStyle = '#eab308';
+  ctx.lineWidth = Math.max(1.5, 2.5 * sc);
+  strokeLaneLine(ctx, s, 0.02);
+  strokeLaneLine(ctx, s, 0.98);
 };

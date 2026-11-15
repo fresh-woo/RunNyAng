@@ -1,6 +1,8 @@
 import { project, SHADOW_CONFIG } from '../lib/projection';
 import { getZoneAt } from '../model/cauStage1';
-import { ROAD_LEFT, ROAD_RIGHT } from '../../../shared/config/gameConfig';
+import { ROAD_LEFT, ROAD_RIGHT, STAGE_LENGTH, CAMPUS_GATE_M } from '../../../shared/config/gameConfig';
+import { HOSPITAL_TREE_GAP, STREET_BUILDINGS_END_M } from '../model/streetBuildings';
+import { drawStreetBuildings, drawStreetLots } from './drawStreetBuildings';
 
 /**
  * 3/4 쿼터뷰 입체 건물(앞면+오른쪽옆면+지붕) 및 테마별 환경 소품 렌더링
@@ -12,6 +14,11 @@ export const drawCampusBuildings = (
 ): void => {
   ctx.save();
 
+  // 학교 밖 거리 구간(0 ~ 540m)의 길가 상가 건물
+  // 건물 땅 -> 오른쪽 건물 -> 길가 소품 -> 왼쪽 건물 순서 (시점상 왼쪽 건물이 왼쪽 인도 소품을 가림)
+  drawStreetLots(ctx, playerWorldY);
+  drawStreetBuildings(ctx, playerWorldY, 'RIGHT');
+
   // 플레이어 시야 범위 (-10m ~ +52m) 내의 구간별 소품 및 랜드마크 구조물 배치
   // 6m 단위로 체크하여 각 위치의 테마에 맞는 건물과 가로수, 소품 렌더링
   const stepM = 8;
@@ -20,7 +27,7 @@ export const drawCampusBuildings = (
 
   // 원경(깊은 곳, relMeters가 큰 것)부터 근경 순서로 렌더링
   for (let m = maxM; m >= minM; m -= stepM) {
-    if (m < 0 || m > 520) continue;
+    if (m < 0 || m > STAGE_LENGTH + 20) continue;
     const relM = m - playerWorldY;
     const zone = getZoneAt(m);
 
@@ -33,8 +40,53 @@ export const drawCampusBuildings = (
 
     // 테마별 환경 소품 및 건물 렌더링
     switch (zone.theme) {
+      case 'HEUKSEOK_STATION': {
+        // [0 ~ 270m] 0_270.png: 흑석역 앞 시내 거리
+        // 양쪽 전봇대(전선), 오른쪽 가로등, 왼쪽 파란 분리수거함, 길가 표지판
+        if (m % 24 === 0) {
+          drawUtilityPole(ctx, pLeft.sx + 4 * pLeft.scale, pLeft.sy, pLeft.scale, -1);
+        }
+        if (m % 24 === 16) {
+          drawUtilityPole(ctx, pRight.sx + 2 * pRight.scale, pRight.sy, pRight.scale, 1);
+        }
+        if (m % 32 === 8) {
+          drawCityLamp(ctx, pRight.sx - 6 * pRight.scale, pRight.sy, pRight.scale);
+        }
+        if (m % 40 === 16) {
+          drawRecycleBins(ctx, pLeft.sx - 10 * pLeft.scale, pLeft.sy, pLeft.scale);
+        }
+        if (m % 56 === 32) {
+          drawBlueSignPole(ctx, pLeft.sx + 14 * pLeft.scale, pLeft.sy, pLeft.scale);
+        }
+        break;
+      }
+
+      case 'CAU_HOSPITAL': {
+        // [270 ~ 540m] 270_510.png: 중앙대 병원 앞
+        // 왼쪽: 병원 앞과 병원 옆 공터의 가로수, 공터 펜스 / 오른쪽: 검은 볼라드, 가로등, 전봇대
+        if (m < HOSPITAL_TREE_GAP.toM) {
+          drawCampusTree(ctx, pLeft.sx + 2 * pLeft.scale, pLeft.sy, pLeft.scale, m % 16 === 0 ? 'OAK' : 'DENSE');
+          if (m >= HOSPITAL_TREE_GAP.fromM) {
+            drawCampusTree(ctx, pLeft.sx - 120 * pLeft.scale, pLeft.sy, pLeft.scale, 'TALL');
+            drawRoundBush(ctx, pLeft.sx - 60 * pLeft.scale, pLeft.sy, pLeft.scale);
+            drawMetalRailing(ctx, pLeft.sx - 40 * pLeft.scale, pLeft.sy, pLeft.scale);
+          }
+        } else if (m % 24 === 8) {
+          drawUtilityPole(ctx, pLeft.sx + 4 * pLeft.scale, pLeft.sy, pLeft.scale, -1);
+        }
+
+        drawBollard(ctx, pRight.sx - 18 * pRight.scale, pRight.sy, pRight.scale, '#1f2937');
+        if (m % 32 === 0) {
+          drawCityLamp(ctx, pRight.sx - 4 * pRight.scale, pRight.sy, pRight.scale);
+        }
+        if (m % 40 === 24) {
+          drawUtilityPole(ctx, pRight.sx + 8 * pRight.scale, pRight.sy, pRight.scale, 1);
+        }
+        break;
+      }
+
       case 'GATE_ENTRANCE': {
-        // [0 ~ 100m] 0_100.png: 정문 안 진입로
+        // [540 ~ 640m] 0_100.png: 정문 안 진입로
         // 왼쪽: 102관 약학대학 R&D센터 유리 커튼월 현대식 건물 (앞면+오른쪽옆면+지붕)
         draw3DModernGlassBuilding(
             ctx,
@@ -50,6 +102,8 @@ export const drawCampusBuildings = (
         drawBollard(ctx, pLeft.sx + 10 * pLeft.scale, pLeft.sy, pLeft.scale, (m % 16 === 0) ? '#eab308' : '#0f172a');
 
         // 오른쪽: 가로수 줄 + 넓은 잔디밭 + 캠퍼스 벤치 (0_100.png)
+        // (정문 바로 앞 모퉁이 가게(써브웨이) 자리는 비움)
+        if (m < STREET_BUILDINGS_END_M) break;
         drawCampusTree(ctx, pRight.sx + 45 * pRight.scale, pRight.sy, pRight.scale, 'OAK');
         if (m % 16 === 8) {
           drawCampusBench(ctx, pRight.sx + 75 * pRight.scale, pRight.sy, pRight.scale);
@@ -58,7 +112,7 @@ export const drawCampusBuildings = (
       }
 
       case 'BETWEEN_BUILDINGS': {
-        // [100 ~ 160m] 100_160.png: 건물 사이 보행로
+        // [640 ~ 700m] 100_160.png: 건물 사이 보행로
         // 왼쪽: 짙은 돌벽 건물 모퉁이와 그늘진 아케이드
         draw3DStoneBuilding(
           ctx,
@@ -69,7 +123,7 @@ export const drawCampusBuildings = (
           pLeft.scale
         );
         // 왼쪽: 파란 표지 기둥 (100_160.png)
-        if (m === 112 || m === 136) {
+        if (m === CAMPUS_GATE_M + 108 || m === CAMPUS_GATE_M + 140) {
           drawBlueSignPole(ctx, pLeft.sx + 5 * pLeft.scale, pLeft.sy, pLeft.scale);
         }
 
@@ -80,7 +134,7 @@ export const drawCampusBuildings = (
       }
 
       case 'TREE_SQUARE': {
-        // [160 ~ 200m] 160_200.png: 빼빼로 광장
+        // [700 ~ 740m] 160_200.png: 빼빼로 광장
         // 왼쪽/오른쪽: 키 큰 활엽수 빽빽, 둥근 덤불, 낮은 계단 금속 난간
         drawCampusTree(ctx, pLeft.sx - 40 * pLeft.scale, pLeft.sy, pLeft.scale, 'TALL');
         drawRoundBush(ctx, pLeft.sx - 10 * pLeft.scale, pLeft.sy, pLeft.scale);
@@ -96,7 +150,7 @@ export const drawCampusBuildings = (
       }
 
       case 'CAMPUS_UPHILL': {
-        // [200 ~ 300m] 200_300.png: 캠퍼스 오르막 차도
+        // [740 ~ 840m] 200_300.png: 캠퍼스 오르막 차도
         // 왼쪽: 붉은 벽돌 강의동 건물 + 가로수
         if (m % 24 === 0) {
           draw3DRedBrickBuilding(
@@ -115,14 +169,14 @@ export const drawCampusBuildings = (
         drawRoundBush(ctx, pRight.sx + 15 * pRight.scale, pRight.sy, pRight.scale);
 
         // 공사 안전펜스 / 라바콘 (200_300.png)
-        if (m >= 230 && m <= 260 && m % 12 === 0) {
+        if (m >= CAMPUS_GATE_M + 230 && m <= CAMPUS_GATE_M + 260 && m % 12 === 0) {
           drawConstructionFence(ctx, pLeft.sx + 15 * pLeft.scale, pLeft.sy, pLeft.scale);
         }
         break;
       }
 
       case 'LIBRARY_STAIRS': {
-        // [300 ~ 340m] 300_340.png: 도서관 옆 긴 계단
+        // [840 ~ 880m] 300_340.png: 도서관 옆 긴 계단
         // 왼쪽: 경사형 유리 지붕 에스컬레이터/엘리베이터 구조물
         drawSlopedGlassCanopy(
           ctx,
@@ -143,7 +197,7 @@ export const drawCampusBuildings = (
       }
 
       case 'FOREST_SLOPE': {
-        // [340 ~ 370m] 340_370.png: 숲길 오르막
+        // [880 ~ 910m] 340_370.png: 숲길 오르막
         // 양쪽 짙은 초록 숲과 덤불, 오른쪽 붉은 벽돌 화단 경계
         drawCampusTree(ctx, pLeft.sx - 35 * pLeft.scale, pLeft.sy, pLeft.scale, 'DENSE');
         drawRoundBush(ctx, pLeft.sx - 10 * pLeft.scale, pLeft.sy, pLeft.scale);
@@ -154,7 +208,7 @@ export const drawCampusBuildings = (
       }
 
       case 'BUILDING_SLOPE': {
-        // [370 ~ 450m] 370_450.png: 건물 옆 비탈길
+        // [910 ~ 990m] 370_450.png: 건물 옆 비탈길
         // 왼쪽: 거대한 유리 커튼월 현대식 건물 + 철제 난간 + 풀 화단
         if (m % 24 === 0) {
           draw3DModernGlassBuilding(
@@ -178,7 +232,7 @@ export const drawCampusBuildings = (
       }
 
       case 'BUILDING_310': {
-        // [450 ~ 500m] 450_500.png: 310관 앞 마지막 직선
+        // [990 ~ 1040m] 450_500.png: 310관 앞 마지막 직선
         // 오른쪽: 캠퍼스 현수막 게시대와 화단
         drawBannerFence(ctx, pRight.sx + 15 * pRight.scale, pRight.sy, pRight.scale);
         drawCampusTree(ctx, pRight.sx + 50 * pRight.scale, pRight.sy, pRight.scale, 'WINTER');
@@ -186,8 +240,8 @@ export const drawCampusBuildings = (
         // 왼쪽: 광장과 앙상한 나무
         drawCampusTree(ctx, pLeft.sx - 35 * pLeft.scale, pLeft.sy, pLeft.scale, 'WINTER');
 
-        // 500m 지점: 회색 화강암 310관 입구 거대 게이트와 "310" 금색 로고
-        if (m >= 490) {
+        // 도착 지점: 회색 화강암 310관 입구 거대 게이트와 "310" 금색 로고
+        if (m >= STAGE_LENGTH - 10) {
           draw310GrandGate(
             ctx,
             (pLeft.sx + pRight.sx) / 2,
@@ -199,6 +253,8 @@ export const drawCampusBuildings = (
       }
     }
   }
+
+  drawStreetBuildings(ctx, playerWorldY, 'LEFT');
 
   ctx.restore();
 };
@@ -856,5 +912,111 @@ const draw310GrandGate = (
   ctx.shadowOffsetY = 0;
   ctx.fillText('100주년 기념관 (도착)', centerX, baseY - gh + 52 * scale);
 
+  ctx.restore();
+};
+
+/**
+ * 콘크리트 전봇대 + 완금 + 변압기 + 위로 뻗는 전선 (0_270.png, 270_510.png)
+ * lean: 전선이 뻗어 나가는 방향 (-1 왼쪽 위, 1 오른쪽 위)
+ */
+const drawUtilityPole = (
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  baseY: number,
+  scale: number,
+  lean: -1 | 1
+): void => {
+  ctx.save();
+  const ph = 230 * scale;
+  const pw = 9 * scale;
+
+  ctx.fillStyle = SHADOW_CONFIG.color;
+  ctx.beginPath();
+  ctx.ellipse(x + 6 * scale, baseY + 3 * scale, 10 * scale, 4 * scale, 0.2, 0, Math.PI * 2);
+  ctx.fill();
+
+  // 기둥 (위로 갈수록 살짝 가늘게)
+  ctx.fillStyle = '#9ca3af';
+  ctx.beginPath();
+  ctx.moveTo(x - pw / 2, baseY);
+  ctx.lineTo(x + pw / 2, baseY);
+  ctx.lineTo(x + pw * 0.35, baseY - ph);
+  ctx.lineTo(x - pw * 0.35, baseY - ph);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = '#6b7280';
+  ctx.fillRect(x, baseY - ph, pw * 0.4, ph);
+
+  // 완금 2단
+  ctx.fillStyle = '#374151';
+  ctx.fillRect(x - 26 * scale, baseY - ph + 14 * scale, 52 * scale, 4 * scale);
+  ctx.fillRect(x - 20 * scale, baseY - ph + 40 * scale, 40 * scale, 4 * scale);
+
+  // 변압기 통
+  ctx.fillStyle = '#d1d5db';
+  ctx.fillRect(x + 6 * scale, baseY - ph + 60 * scale, 14 * scale, 26 * scale);
+  ctx.fillStyle = '#9ca3af';
+  ctx.fillRect(x + 6 * scale, baseY - ph + 60 * scale, 14 * scale, 4 * scale);
+
+  // 전선 (다음 전봇대 쪽으로 멀리 뻗어 나감 = 화면 위쪽)
+  ctx.strokeStyle = 'rgba(17, 24, 39, 0.75)';
+  ctx.lineWidth = Math.max(1, 1.2 * scale);
+  for (const [ox, oy, dx] of [
+    [-24, 14, 30],
+    [24, 14, 60],
+    [-18, 40, 10],
+    [18, 40, 45],
+  ] as const) {
+    const sx = x + ox * scale;
+    const sy = baseY - ph + oy * scale;
+    ctx.beginPath();
+    ctx.moveTo(sx, sy);
+    ctx.quadraticCurveTo(sx + lean * dx * 0.5 * scale, sy - 60 * scale, sx + lean * dx * scale - 40 * scale, sy - 200 * scale);
+    ctx.stroke();
+  }
+  ctx.restore();
+};
+
+/** 시내 가로등 (휘어진 팔 + 납작한 등) */
+const drawCityLamp = (
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  baseY: number,
+  scale: number
+): void => {
+  ctx.save();
+  const lh = 170 * scale;
+  ctx.fillStyle = '#4b5563';
+  ctx.fillRect(x - 2.5 * scale, baseY - lh, 5 * scale, lh);
+  ctx.strokeStyle = '#4b5563';
+  ctx.lineWidth = Math.max(2, 4 * scale);
+  ctx.beginPath();
+  ctx.moveTo(x, baseY - lh);
+  ctx.quadraticCurveTo(x, baseY - lh - 18 * scale, x - 34 * scale, baseY - lh - 14 * scale);
+  ctx.stroke();
+  ctx.fillStyle = '#e5e7eb';
+  ctx.fillRect(x - 46 * scale, baseY - lh - 16 * scale, 18 * scale, 6 * scale);
+  ctx.restore();
+};
+
+/** 파란 분리수거함 2개 (0_270.png 왼쪽) */
+const drawRecycleBins = (
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  baseY: number,
+  scale: number
+): void => {
+  ctx.save();
+  ctx.fillStyle = SHADOW_CONFIG.color;
+  ctx.fillRect(x - 2 * scale, baseY - 2 * scale, 34 * scale, 6 * scale);
+  for (let i = 0; i < 2; i++) {
+    const bx = x + i * 15 * scale;
+    ctx.fillStyle = '#2563eb';
+    ctx.fillRect(bx, baseY - 22 * scale, 13 * scale, 22 * scale);
+    ctx.fillStyle = '#1d4ed8';
+    ctx.fillRect(bx + 8 * scale, baseY - 22 * scale, 5 * scale, 22 * scale);
+    ctx.fillStyle = '#60a5fa';
+    ctx.fillRect(bx - 1 * scale, baseY - 25 * scale, 15 * scale, 4 * scale);
+  }
   ctx.restore();
 };
