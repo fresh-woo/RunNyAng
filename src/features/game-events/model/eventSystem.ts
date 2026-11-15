@@ -11,6 +11,7 @@ import {
   INTERVIEWER,
   CONSTRUCTION,
   ACT_FILMING,
+  SCHOOL_BUS,
 } from './eventConfig';
 
 /** 이벤트로 생성된 장애물 (런타임 이동/정리를 위한 메타 포함) */
@@ -18,6 +19,8 @@ export interface EventObstacle extends StageObject {
   eventSpawned: true;
   /** 인터뷰어처럼 캐릭터를 쫓아오는 장애물 */
   chaser?: boolean;
+  /** 버스에서 내려 도로로 걸어가는 학생의 목표 X */
+  walkTargetX?: number;
 }
 
 export interface EventSystemState {
@@ -27,6 +30,9 @@ export interface EventSystemState {
   /** 에타 이벤트 진행 상태 */
   crowdRemainingMs: number;
   crowdSpawnTimerMs: number;
+  busWorldY: number | null;
+  busStudentsRemaining: number;
+  busSpawnTimerMs: number;
   /** 화면에 표시 중인 문구 */
   bannerMessage: string | null;
   bannerRemainingMs: number;
@@ -38,6 +44,9 @@ export const createEventSystemState = (): EventSystemState => ({
   cooldownMs: EVENT_TUNING.minGapMs,
   crowdRemainingMs: 0,
   crowdSpawnTimerMs: 0,
+  busWorldY: null,
+  busStudentsRemaining: 0,
+  busSpawnTimerMs: 0,
   bannerMessage: null,
   bannerRemainingMs: 0,
   nextId: 0,
@@ -45,6 +54,7 @@ export const createEventSystemState = (): EventSystemState => ({
 
 const PLAY_MIN_X = ROAD_LEFT + 10;
 const PLAY_MAX_X = ROAD_RIGHT - 10;
+const BUS_X = ROAD_LEFT - 120;
 
 const rand = (min: number, max: number) => min + Math.random() * (max - min);
 const clampX = (x: number, width: number) =>
@@ -79,6 +89,18 @@ const spawnAheadY = (player: Player) =>
 const spawnCrowdPerson = (s: EventSystemState, player: Player, objects: StageObject[]) => {
   const x = rand(PLAY_MIN_X, PLAY_MAX_X - STUDENT_SIZE.width);
   objects.push(makeStudent(s, x, spawnAheadY(player), '몰려온 학생'));
+};
+
+const spawnBusStudent = (s: EventSystemState, objects: StageObject[]) => {
+  if (s.busWorldY === null) return;
+  const student = makeStudent(
+    s,
+    BUS_X + SCHOOL_BUS.width - 30,
+    s.busWorldY + rand(-0.25, 0.25),
+    '등교하는 학생'
+  );
+  student.walkTargetX = rand(ROAD_LEFT + 160, ROAD_RIGHT - STUDENT_SIZE.width - 20);
+  objects.push(student);
 };
 
 const triggerEvent = (
@@ -131,6 +153,23 @@ const triggerEvent = (
       }
       break;
     }
+    case 'SCHOOL_BUS': {
+      s.busWorldY = player.worldY + SCHOOL_BUS.spawnAheadM;
+      s.busStudentsRemaining = SCHOOL_BUS.studentCount;
+      s.busSpawnTimerMs = SCHOOL_BUS.firstStudentDelayMs;
+      objects.push({
+        id: `evt_${s.nextId++}`,
+        name: '동작01 마을버스',
+        worldY: s.busWorldY,
+        x: BUS_X,
+        width: SCHOOL_BUS.width,
+        height: SCHOOL_BUS.height,
+        type: 'DECORATION',
+        subType: 'BUS',
+        eventSpawned: true,
+      } as EventObstacle);
+      break;
+    }
   }
 
   s.bannerMessage = def.message;
@@ -176,9 +215,24 @@ export const updateGameEvents = (
     }
   }
 
-  // 3. 인터뷰어 추적 이동
+  // 3. 정차한 버스에서 학생들이 차례로 내려 도로 쪽으로 걸어감
+  if (s.busStudentsRemaining > 0) {
+    s.busSpawnTimerMs -= deltaTimeMs;
+    if (s.busSpawnTimerMs <= 0) {
+      spawnBusStudent(s, objects);
+      s.busStudentsRemaining -= 1;
+      s.busSpawnTimerMs = SCHOOL_BUS.spawnIntervalMs;
+      if (s.busStudentsRemaining === 0) s.busWorldY = null;
+    }
+  }
+
+  // 4. 학생 이동 및 인터뷰어 추적 이동
   for (const obj of objects) {
     const evt = obj as EventObstacle;
+    if (evt.walkTargetX !== undefined && !evt.collected) {
+      evt.x = Math.min(evt.walkTargetX, evt.x + SCHOOL_BUS.walkSpeedPxPerSec * dtSec);
+      evt.worldY += SCHOOL_BUS.walkForwardMps * dtSec;
+    }
     if (!evt.chaser || evt.collected) continue;
     // 아직 캐릭터 앞에 있을 때만 쫓아옴 (지나치면 포기)
     if (evt.worldY < player.worldY) continue;
@@ -189,13 +243,13 @@ export const updateGameEvents = (
     evt.worldY -= INTERVIEWER.approachSpeedMps * dtSec;
   }
 
-  // 4. 배너 타이머
+  // 5. 배너 타이머
   if (s.bannerRemainingMs > 0) {
     s.bannerRemainingMs -= deltaTimeMs;
     if (s.bannerRemainingMs <= 0) s.bannerMessage = null;
   }
 
-  // 5. 지나간/맞은 이벤트 장애물 정리
+  // 6. 지나간/맞은 이벤트 장애물 정리
   const cutoff = player.worldY - EVENT_TUNING.cleanupBehindM;
   return objects.filter(
     (o) => !(o as EventObstacle).eventSpawned || (!o.collected && o.worldY >= cutoff)

@@ -100,7 +100,18 @@ export const drawStageObjects = (
         );
         ctx.fill();
 
-        if (obj.type === 'LANDMARK') {
+        if (obj.type === 'DECORATION' && obj.subType === 'BUS') {
+          const busImg = assets?.stageAssets.obsBus;
+          if (busImg && busImg.complete) {
+            ctx.drawImage(busImg, drawX, drawY, drawW, drawH);
+          } else {
+            ctx.fillStyle = '#15803d';
+            ctx.fillRect(drawX, drawY, drawW, drawH);
+            ctx.fillStyle = '#ffffff';
+            ctx.font = `bold ${Math.round(12 * scale)}px sans-serif`;
+            ctx.fillText('동작01', drawX + 8 * scale, drawY + 25 * scale);
+          }
+        } else if (obj.type === 'LANDMARK') {
           // 캠퍼스 입체 랜드마크 팻말
           draw3DLandmarkSign(ctx, drawX, drawY, drawW, drawH, scale, obj.name);
         } else if (obj.type === 'FINISH_LINE') {
@@ -184,7 +195,7 @@ export const drawStageObjects = (
     ctx.save();
     ctx.lineWidth = 2;
     for (const obj of objects) {
-      if (obj.collected || obj.type === 'LANDMARK') continue;
+      if (obj.collected || obj.type === 'LANDMARK' || obj.type === 'DECORATION') continue;
       const relMeters = obj.worldY - playerWorldY;
       if (relMeters < -6 || relMeters > 55) continue;
       const r = getObjectHitbox(obj, playerWorldY);

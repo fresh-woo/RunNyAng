@@ -65,6 +65,14 @@
   margin-top: 4px;
 }
 
+.pause-return-btn {
+  margin-top: 8px;
+}
+
+.pause-return-btn .btn-pixel-img {
+  height: 64px;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;

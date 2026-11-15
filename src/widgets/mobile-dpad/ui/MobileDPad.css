@@ -34,10 +34,10 @@
 .dpad-img {
   width: 56px;
   height: 56px;
-  image-rendering: pixelated;
+  object-fit: contain;
   image-rendering: crisp-edges;
+  image-rendering: pixelated;
   display: block;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
 }
 
 /* Cross layout: Up center-top, Left left-center, Right right-center, Down center-bottom */

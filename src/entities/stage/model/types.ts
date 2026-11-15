@@ -1,4 +1,4 @@
-export type StageObjectType = 'OBSTACLE' | 'ITEM' | 'LANDMARK' | 'FINISH_LINE';
+export type StageObjectType = 'OBSTACLE' | 'ITEM' | 'LANDMARK' | 'FINISH_LINE' | 'DECORATION';
 
 export type StageZoneTheme =
   | 'GATE_ENTRANCE'     // 0 ~ 100m: 정문 안 진입로 (0_100.png)
@@ -27,7 +27,7 @@ export interface StageObject {
   height: number;
   type: StageObjectType;
   color?: string;
-  subType?: 'KICKBOARD' | 'COFFEE' | 'EXAM' | 'CHURU' | 'BLUE_DRAGON' | 'BUILDING_310' | 'STUDENT';
+  subType?: 'KICKBOARD' | 'COFFEE' | 'EXAM' | 'CHURU' | 'BLUE_DRAGON' | 'BUILDING_310' | 'STUDENT' | 'BUS';
   collected?: boolean;
 }
 

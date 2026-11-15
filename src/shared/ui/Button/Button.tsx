@@ -4,9 +4,10 @@ import btnStartUrl from '../../../assets/images/ui/btn_start.png';
 import btnRetryUrl from '../../../assets/images/ui/btn_retry.png';
 import btnPauseUrl from '../../../assets/images/ui/btn_pause.png';
 import btnPlayUrl from '../../../assets/images/ui/btn_play.png';
+import btnExitUrl from '../../../assets/images/ui/btn_exit_clean.png';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'start' | 'retry' | 'pause' | 'play';
+  variant?: 'primary' | 'secondary' | 'start' | 'retry' | 'pause' | 'play' | 'exit';
   children?: React.ReactNode;
 }
 
@@ -15,6 +16,7 @@ const PIXEL_BUTTON_MAP: Partial<Record<string, string>> = {
   retry: btnRetryUrl,
   pause: btnPauseUrl,
   play: btnPlayUrl,
+  exit: btnExitUrl,
 };
 
 export const Button: React.FC<ButtonProps> = ({
