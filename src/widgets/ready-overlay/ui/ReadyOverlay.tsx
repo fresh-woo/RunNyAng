@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { RankingBoard } from '../../ranking-board';
 import { Overlay } from '../../../shared/ui/Overlay/Overlay';
 import { Button } from '../../../shared/ui/Button/Button';
 import catPortraitUrl from '../../../assets/images/cat/cat_portrait.png';
+import { ShopDex, ShopDexButton } from '../../shop-dex';
 
 interface ReadyOverlayProps {
   onStart: () => void;
@@ -10,10 +11,13 @@ interface ReadyOverlayProps {
 
 export const ReadyOverlay: React.FC<ReadyOverlayProps> = ({ onStart }) => {
   const [showRanking, setShowRanking] = useState(false);
+  const [showDex, setShowDex] = useState(false);
+  const dexButtonRef = useRef<HTMLButtonElement>(null);
 
   return (
     <>
     <Overlay>
+      <ShopDexButton ref={dexButtonRef} onClick={() => setShowDex(true)} />
       <img
         src={catPortraitUrl}
         alt="냥이"
@@ -41,6 +45,7 @@ export const ReadyOverlay: React.FC<ReadyOverlayProps> = ({ onStart }) => {
       </Button>
     </Overlay>
     {showRanking && <RankingBoard onClose={() => setShowRanking(false)} />}
+    {showDex && <ShopDex onClose={() => { setShowDex(false); dexButtonRef.current?.focus(); }} />}
     </>
   );
 };
