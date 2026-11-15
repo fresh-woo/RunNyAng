@@ -132,6 +132,35 @@ export const useGameEngine = () => {
     }));
   }, []);
 
+  const returnToStart = useCallback(() => {
+    pauseStartTimeRef.current = 0;
+    inputRef.current = {
+      moveLeft: false,
+      moveRight: false,
+      moveUp: false,
+      moveDown: false,
+    };
+    engineStateRef.current = {
+      state: 'READY',
+      player: createInitialPlayer(),
+      objects: getStage1Objects(),
+      coinsCollected: 0,
+      startTime: 0,
+      lastFrameTime: performance.now(),
+      events: createEventSystemState(),
+    };
+    setGameState('READY');
+    setEventMessage(null);
+    setScoreData((prev) => ({
+      ...prev,
+      distance: 0,
+      progressPercent: 0,
+      coins: 0,
+      elapsedSeconds: 0,
+      currentZoneLabel: getZoneAt(0).label,
+    }));
+  }, []);
+
   useEffect(() => {
     let animationFrameId: number;
     const canvas = canvasRef.current;
@@ -172,7 +201,7 @@ export const useGameEngine = () => {
         // 화면에 실제로 그려지는 고양이 스프라이트 사각형 vs 투영된 오브젝트 사각형 (AABB)
         const playerBox = getPlayerHitbox(g.player);
         for (const obj of g.objects) {
-          if (obj.collected) continue;
+          if (obj.collected || obj.type === 'DECORATION') continue;
 
           // 가까운 오브젝트만 투영해서 검사
           const isNearby = Math.abs(obj.worldY - g.player.worldY) * PIXELS_PER_METER < 200;
@@ -251,6 +280,7 @@ export const useGameEngine = () => {
     scoreData,
     eventMessage,
     startOrRestartGame,
+    returnToStart,
     pauseGame,
     resumeGame,
     togglePause,

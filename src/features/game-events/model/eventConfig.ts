@@ -1,6 +1,6 @@
 // 랜덤 이벤트 튜닝 상수 모음 (확률/빈도/크기를 여기서만 조정하면 됨)
 
-export type GameEventId = 'ETA_CROWD' | 'INTERVIEWER' | 'CONSTRUCTION' | 'ACT_FILMING';
+export type GameEventId = 'ETA_CROWD' | 'INTERVIEWER' | 'CONSTRUCTION' | 'ACT_FILMING' | 'SCHOOL_BUS';
 
 export interface GameEventDef {
   id: GameEventId;
@@ -14,6 +14,7 @@ export const GAME_EVENTS: GameEventDef[] = [
   { id: 'INTERVIEWER', message: '인터뷰를 하려고 하는 사람이 다가온다!', weight: 1 },
   { id: 'CONSTRUCTION', message: '공사 중인 길이다!', weight: 1 },
   { id: 'ACT_FILMING', message: 'ACT 촬영 중인 사람들이 나타났다!', weight: 1 },
+  { id: 'SCHOOL_BUS', message: '동작01로 등교하는 사람들이 보인다!', weight: 1 },
 ];
 
 export const EVENT_TUNING = {
@@ -67,4 +68,16 @@ export const ACT_FILMING = {
   spreadXPx: 110,
   /** 무리의 세로 퍼짐 (m) */
   spreadYM: 2.5,
+};
+
+/** 동작01 버스가 정차하고 학생들이 도로 쪽으로 걸어 나옴 */
+export const SCHOOL_BUS = {
+  width: 180,
+  height: 150,
+  spawnAheadM: 8,
+  studentCount: 4,
+  firstStudentDelayMs: 700,
+  spawnIntervalMs: 350,
+  walkSpeedPxPerSec: 100,
+  walkForwardMps: 2,
 };

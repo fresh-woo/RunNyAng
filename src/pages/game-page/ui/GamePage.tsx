@@ -18,6 +18,7 @@ export const GamePage: React.FC = () => {
     scoreData,
     eventMessage,
     startOrRestartGame,
+    returnToStart,
     resumeGame,
     togglePause,
     setInput,
@@ -67,7 +68,9 @@ export const GamePage: React.FC = () => {
 
         {gameState === 'READY' && <ReadyOverlay onStart={startOrRestartGame} />}
 
-        {gameState === 'PAUSED' && <PauseOverlay onResume={resumeGame} />}
+        {gameState === 'PAUSED' && (
+          <PauseOverlay onResume={resumeGame} onReturnToStart={returnToStart} />
+        )}
 
         {gameState === 'GAMEOVER' && (
           <GameOverModal scoreData={scoreData} onRetry={startOrRestartGame} />
