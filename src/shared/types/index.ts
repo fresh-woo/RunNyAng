@@ -1,4 +1,4 @@
-export type GameState = 'READY' | 'PLAYING' | 'PAUSED' | 'GAMEOVER' | 'CLEAR';
+export type GameState = 'READY' | 'INTRO' | 'RULEBOOK' | 'PLAYING' | 'PAUSED' | 'GAMEOVER' | 'CLEAR';
 
 export interface ScoreData {
   distance: number;

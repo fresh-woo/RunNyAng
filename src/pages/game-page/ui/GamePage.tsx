@@ -9,6 +9,8 @@ import { StageClearModal } from '../../../widgets/stage-clear-modal';
 import { PauseOverlay } from '../../../widgets/pause-overlay';
 import { MobileDPad } from '../../../widgets/mobile-dpad';
 import { EventBanner } from '../../../widgets/event-banner';
+import { StoryCutscene } from '../../../widgets/story-cutscene';
+import { Rulebook } from '../../../widgets/rulebook';
 import './GamePage.css';
 
 export const GamePage: React.FC = () => {
@@ -18,6 +20,8 @@ export const GamePage: React.FC = () => {
     scoreData,
     eventMessage,
     startOrRestartGame,
+    beginStory,
+    showRulebook,
     returnToStart,
     resumeGame,
     togglePause,
@@ -35,7 +39,7 @@ export const GamePage: React.FC = () => {
     setMoveUp,
     setMoveDown,
   } = useGameControls({
-    onStartOrRestart: startOrRestartGame,
+    onStartOrRestart: gameState === 'READY' ? beginStory : startOrRestartGame,
     onTogglePause: togglePause,
     gameState,
     isReadyOrEnded,
@@ -49,11 +53,11 @@ export const GamePage: React.FC = () => {
   return (
     <main className="game-page-container">
       <div className="game-frame">
-        <HUD
+        {gameState !== 'INTRO' && gameState !== 'RULEBOOK' && <HUD
           scoreData={scoreData}
           gameState={gameState}
           onTogglePause={togglePause}
-        />
+        />}
 
         {gameState === 'PLAYING' && <EventBanner message={eventMessage} />}
 
@@ -66,7 +70,11 @@ export const GamePage: React.FC = () => {
           onTouchEnd={handleTouchEnd}
         />
 
-        {gameState === 'READY' && <ReadyOverlay onStart={startOrRestartGame} />}
+        {gameState === 'READY' && <ReadyOverlay onStart={beginStory} />}
+
+        {gameState === 'INTRO' && <StoryCutscene onComplete={showRulebook} />}
+
+        {gameState === 'RULEBOOK' && <Rulebook onStart={startOrRestartGame} />}
 
         {gameState === 'PAUSED' && (
           <PauseOverlay onResume={resumeGame} onReturnToStart={returnToStart} />
@@ -90,9 +98,6 @@ export const GamePage: React.FC = () => {
           />
         )}
 
-        <footer className="controls-hint-bar">
-          🎮 조작법: [← / →] 좌우 이동 | [↑ / W] 가속 | [↓ / S] 감속 | [ESC] 일시정지 | 모바일: D-PAD
-        </footer>
       </div>
     </main>
   );

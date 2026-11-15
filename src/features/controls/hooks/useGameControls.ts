@@ -37,6 +37,7 @@ export const useGameControls = ({
   // Keyboard controls
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (gameState === 'INTRO' || gameState === 'RULEBOOK') return;
       // 닉네임 입력 등 텍스트 입력 중에는 게임 단축키를 막는다
       const target = e.target as HTMLElement | null;
       if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
@@ -54,6 +55,8 @@ export const useGameControls = ({
 
       if (e.code === 'Space' || e.code === 'Enter') {
         if (isReadyOrEnded) {
+          e.preventDefault();
+          if (e.repeat) return;
           onStartOrRestart();
           return;
         }
@@ -102,7 +105,7 @@ export const useGameControls = ({
 
   // Touch handler for mobile (touch left half to go left, touch right half to go right)
   const handleTouchStart = (clientX: number, windowWidth: number) => {
-    if (gameState === 'PAUSED') {
+    if (gameState === 'PAUSED' || gameState === 'INTRO' || gameState === 'RULEBOOK') {
       return;
     }
     if (isReadyOrEnded) {

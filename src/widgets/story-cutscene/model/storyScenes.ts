@@ -1,0 +1,38 @@
+export const storyScenes = [
+  {
+    title: '전날 밤 신나게 과음!',
+    viewBox: '0 0 509 379',
+    imageDescription: '축제 뒤풀이에서 친구와 잔을 부딪치는 학생',
+    speaker: '축제 뒤풀이',
+    dialogue: '“짠!” “마셔 마셔!”',
+    narration: '어젯밤, 축제 뒤풀이에서 코가 삐뚤어지게 과음해 버렸다...',
+    effect: '',
+  },
+  {
+    title: '비틀비틀 시야가 흐려짐',
+    viewBox: '515 0 509 379',
+    imageDescription: '어두운 거리에서 시야가 소용돌이처럼 흐려진다',
+    speaker: '나의 독백',
+    dialogue: '(으으... 머리가 깨질 것 같아... 빙그르 시야가 흐려지더니...)',
+    narration: '',
+    effect: '(비틀비틀, 어질어질)',
+  },
+  {
+    title: '눈 떠보니 흑석역 앞 고양이?!',
+    viewBox: '0 386 509 379',
+    imageDescription: '흑석역 입구 앞에 서 있는 고양이의 앞발',
+    speaker: '중냥이',
+    dialogue: '“냥?! (내 손이... 아니, 내 앞발이 왜 이래?!)”',
+    narration: '눈을 떠보니... 난데없이 흑석역 앞에서 길고양이(중냥이)가 되어 있었다?!',
+    effect: '',
+  },
+  {
+    title: '학교를 향해 달려가는 중냥이',
+    viewBox: '515 386 509 379',
+    imageDescription: '중앙대학교 정문과 310관을 향해 달려가는 중냥이',
+    speaker: '중냥이',
+    dialogue: '“일단 학교 310관으로 가서 해결 방법을 찾아야 해! 달려라, 중냥이!”',
+    narration: '',
+    effect: '(호다닥! 호다닥!)',
+  },
+];

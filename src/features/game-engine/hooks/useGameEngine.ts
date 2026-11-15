@@ -132,6 +132,18 @@ export const useGameEngine = () => {
     }));
   }, []);
 
+  const beginStory = useCallback(() => {
+    if (engineStateRef.current.state !== 'READY') return;
+    engineStateRef.current.state = 'INTRO';
+    setGameState('INTRO');
+  }, []);
+
+  const showRulebook = useCallback(() => {
+    if (engineStateRef.current.state !== 'INTRO') return;
+    engineStateRef.current.state = 'RULEBOOK';
+    setGameState('RULEBOOK');
+  }, []);
+
   const returnToStart = useCallback(() => {
     pauseStartTimeRef.current = 0;
     inputRef.current = {
@@ -280,6 +292,8 @@ export const useGameEngine = () => {
     scoreData,
     eventMessage,
     startOrRestartGame,
+    beginStory,
+    showRulebook,
     returnToStart,
     pauseGame,
     resumeGame,

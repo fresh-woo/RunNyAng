@@ -26,22 +26,3 @@
     border-radius: 0;
   }
 }
-
-.controls-hint-bar {
-  position: absolute;
-  bottom: 16px;
-  left: 0;
-  right: 0;
-  text-align: center;
-  font-size: 0.85rem;
-  color: #94a3b8;
-  z-index: 5;
-  pointer-events: none;
-}
-
-/* 터치 기기에서는 키보드 조작법 안내를 숨긴다 (D-PAD와 겹침) */
-@media (pointer: coarse) {
-  .controls-hint-bar {
-    display: none;
-  }
-}
