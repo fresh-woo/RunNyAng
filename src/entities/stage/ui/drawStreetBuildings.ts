@@ -1,5 +1,5 @@
 import { ROAD_LEFT, ROAD_RIGHT, CANVAS_WIDTH, CANVAS_HEIGHT } from '../../../shared/config/gameConfig';
-import { project } from '../lib/projection';
+import { project, inSceneryLayer, SceneryLayer } from '../lib/projection';
 import { STREET_BUILDINGS } from '../model/streetBuildings';
 import { StreetBuilding } from '../model/types';
 
@@ -533,10 +533,16 @@ export const drawStreetLots = (ctx: CanvasRenderingContext2D, playerWorldY: numb
 export const drawStreetBuildings = (
   ctx: CanvasRenderingContext2D,
   playerWorldY: number,
-  side: 'LEFT' | 'RIGHT'
+  side: 'LEFT' | 'RIGHT',
+  layer: SceneryLayer = 'ALL'
 ): void => {
   const { hi: horizonM, list } = visibleBuildings(playerWorldY);
-  const visible = list.filter((b) => b.side === side);
+  // 앞면 바닥이 고양이 발보다 아래(가까운 쪽)면 고양이를 그린 뒤에 그린다
+  const visible = list.filter(
+    (b) =>
+      b.side === side &&
+      inSceneryLayer(layer, project(edgesForBuilding(b).inner, b.fromM - playerWorldY).sy)
+  );
   if (visible.length === 0) return;
 
   ctx.save();

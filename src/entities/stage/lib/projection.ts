@@ -2,9 +2,27 @@ import {
   ROAD_LEFT,
   ROAD_RIGHT,
   PIXELS_PER_METER,
+  PLAYER_CONFIG,
 } from '../../../shared/config/gameConfig';
 
 export const PLAYER_SCREEN_Y = 420;
+
+/**
+ * 고양이 발밑의 화면 y. 이 선보다 아래(화면 y가 큰 쪽)에 바닥이 닿는 건물·소품은
+ * 고양이보다 카메라에 가까우므로 고양이를 그린 뒤에 그려야 고양이를 가린다.
+ */
+export const PLAYER_FOOT_SCREEN_Y = PLAYER_CONFIG.initialY + PLAYER_CONFIG.height;
+
+/** 배경을 고양이 기준으로 나눠 그릴 때의 층 */
+export type SceneryLayer = 'ALL' | 'BEHIND_PLAYER' | 'FRONT_OF_PLAYER';
+
+/** 바닥 화면 y 가 baseY 인 물체가 이번 층에 들어가는지 */
+export const inSceneryLayer = (layer: SceneryLayer, baseY: number): boolean => {
+  if (layer === 'ALL') return true;
+  const inFront = baseY > PLAYER_FOOT_SCREEN_Y;
+  return layer === 'FRONT_OF_PLAYER' ? inFront : !inFront;
+};
+
 export const ROAD_CENTER_X = (ROAD_LEFT + ROAD_RIGHT) / 2; // 480
 export const ROAD_LOGICAL_WIDTH = ROAD_RIGHT - ROAD_LEFT; // 520
 

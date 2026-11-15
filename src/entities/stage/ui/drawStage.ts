@@ -25,7 +25,8 @@ export const drawCampusEnvironment = (
   drawZoneRoad(ctx, playerWorldY);
 
   // 3. Layer 3: 도로 양옆 3/4 쿼터뷰 입체 건물, 가로수, 소품, 310관 게이트
-  drawCampusBuildings(ctx, playerWorldY);
+  //    고양이보다 먼 것만. 고양이보다 가까운 것은 drawStageObjects 가 고양이를 그린 뒤에 그린다.
+  drawCampusBuildings(ctx, playerWorldY, 'BEHIND_PLAYER');
 };
 
 interface RenderableItem {
@@ -190,6 +191,16 @@ export const drawStageObjects = (
     item.render();
   }
 
+  // 3-1. 고양이보다 카메라에 가까운 건물·소품을 마지막에 그려서 고양이를 가리게 한다
+  //      (drawCampusEnvironment 는 고양이보다 먼 것만 그림)
+  drawCampusBuildings(ctx, playerWorldY, 'FRONT_OF_PLAYER');
+
+  // 3-2. 건물에 가려져도 위치를 잃지 않게 고양이를 반투명하게 한 번 더 그린다
+  //      (가려지지 않았을 때는 같은 그림 위에 겹쳐 그려져 티가 나지 않음)
+  if (playerObj) {
+    drawPlayerGhost(ctx, playerObj, assets?.catRunFrames, assets?.catHurt);
+  }
+
   // 4. 개발용 히트박스 표시 (?hitbox)
   if (SHOW_HITBOX) {
     ctx.save();
@@ -209,6 +220,30 @@ export const drawStageObjects = (
     }
     ctx.restore();
   }
+};
+
+/** 가려진 고양이 실루엣: 그림자·글자 없이 지금 프레임 그림만 반투명하게 */
+const PLAYER_GHOST_ALPHA = 0.4;
+const drawPlayerGhost = (
+  ctx: CanvasRenderingContext2D,
+  p: Player,
+  catFrames?: (HTMLImageElement | null)[],
+  catHurtImg?: HTMLImageElement | null
+): void => {
+  const isStunned = p.stunTimerMs > 0;
+  let img: HTMLImageElement | null | undefined;
+  let bobY = 0;
+  if (isStunned && catHurtImg && catHurtImg.complete) {
+    img = catHurtImg;
+  } else {
+    img = catFrames && catFrames[p.currentFrame];
+    bobY = p.currentFrame === 1 ? -4 : 0; // drawPlayer 와 같은 흔들림
+  }
+  if (!img || !img.complete) return;
+  ctx.save();
+  ctx.globalAlpha = PLAYER_GHOST_ALPHA;
+  ctx.drawImage(img, p.x, p.screenY + bobY, p.width, p.height);
+  ctx.restore();
 };
 
 /**

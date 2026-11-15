@@ -1,4 +1,4 @@
-import { project, SHADOW_CONFIG } from '../lib/projection';
+import { project, SHADOW_CONFIG, inSceneryLayer, SceneryLayer } from '../lib/projection';
 import { getZoneAt } from '../model/cauStage1';
 import { ROAD_LEFT, ROAD_RIGHT, STAGE_LENGTH, CAMPUS_GATE_M } from '../../../shared/config/gameConfig';
 import { HOSPITAL_TREE_GAP, STREET_BUILDINGS_END_M } from '../model/streetBuildings';
@@ -7,17 +7,26 @@ import { drawStreetBuildings, drawStreetLots } from './drawStreetBuildings';
 /**
  * 3/4 쿼터뷰 입체 건물(앞면+오른쪽옆면+지붕) 및 테마별 환경 소품 렌더링
  * 빛 방향: 왼쪽 위 -> 그림자 방향: 오른쪽 아래
+ *
+ * layer: 고양이 발밑 선을 기준으로 나눠 그린다.
+ * - BEHIND_PLAYER: 고양이보다 먼 것 (고양이를 그리기 전)
+ * - FRONT_OF_PLAYER: 고양이보다 가까운 것 (고양이를 그린 뒤, 고양이를 가림)
  */
 export const drawCampusBuildings = (
   ctx: CanvasRenderingContext2D,
-  playerWorldY: number
+  playerWorldY: number,
+  layer: SceneryLayer = 'ALL'
 ): void => {
   ctx.save();
 
   // 학교 밖 거리 구간(0 ~ 540m)의 길가 상가 건물
   // 건물 땅 -> 오른쪽 건물 -> 길가 소품 -> 왼쪽 건물 순서 (시점상 왼쪽 건물이 왼쪽 인도 소품을 가림)
-  drawStreetLots(ctx, playerWorldY);
-  drawStreetBuildings(ctx, playerWorldY, 'RIGHT');
+  // 오른쪽 건물은 고양이가 다니는 도로까지 닿지 않고, 오른쪽 인도 소품보다 먼저 그려야 하므로
+  // 늘 고양이 뒤 층에서 한꺼번에 그린다
+  if (layer !== 'FRONT_OF_PLAYER') {
+    drawStreetLots(ctx, playerWorldY);
+    drawStreetBuildings(ctx, playerWorldY, 'RIGHT');
+  }
 
   // 플레이어 시야 범위 (-10m ~ +52m) 내의 구간별 소품 및 랜드마크 구조물 배치
   // 6m 단위로 체크하여 각 위치의 테마에 맞는 건물과 가로수, 소품 렌더링
@@ -37,6 +46,8 @@ export const drawCampusBuildings = (
 
     // 화면 밖이면 스킵
     if (pLeft.sy < 130 || pLeft.sy > 560) continue;
+    // 이번 층(고양이 뒤/앞)에 속하지 않는 줄은 건너뜀
+    if (!inSceneryLayer(layer, pLeft.sy)) continue;
 
     // 테마별 환경 소품 및 건물 렌더링
     switch (zone.theme) {
@@ -88,9 +99,10 @@ export const drawCampusBuildings = (
       case 'GATE_ENTRANCE': {
         // [540 ~ 640m] 0_100.png: 정문 안 진입로
         // 왼쪽: 102관 약학대학 R&D센터 유리 커튼월 현대식 건물 (앞면+오른쪽옆면+지붕)
+        // (옆면 끝이 인도 안쪽에서 끝나게: 도로까지 나오면 고양이를 가림)
         draw3DModernGlassBuilding(
             ctx,
-            pLeft.sx - 600 * pLeft.scale,
+            pLeft.sx - 660 * pLeft.scale,
             pLeft.sy,
             480 * pLeft.scale,
             6000 * pLeft.scale,
@@ -153,9 +165,10 @@ export const drawCampusBuildings = (
         // [740 ~ 840m] 200_300.png: 캠퍼스 오르막 차도
         // 왼쪽: 붉은 벽돌 강의동 건물 + 가로수
         if (m % 24 === 0) {
+          // (옆면 끝이 인도 안쪽에서 끝나게: 도로까지 나오면 고양이를 가림)
           draw3DRedBrickBuilding(
             ctx,
-            pLeft.sx - 85 * pLeft.scale,
+            pLeft.sx - 165 * pLeft.scale,
             pLeft.sy,
             120 * pLeft.scale,
             140 * pLeft.scale,
@@ -211,9 +224,10 @@ export const drawCampusBuildings = (
         // [910 ~ 990m] 370_450.png: 건물 옆 비탈길
         // 왼쪽: 거대한 유리 커튼월 현대식 건물 + 철제 난간 + 풀 화단
         if (m % 24 === 0) {
+          // (옆면 끝이 인도 안쪽에서 끝나게: 도로까지 나오면 고양이를 가림)
           draw3DModernGlassBuilding(
             ctx,
-            pLeft.sx - 80 * pLeft.scale,
+            pLeft.sx - 170 * pLeft.scale,
             pLeft.sy,
             120 * pLeft.scale,
             160 * pLeft.scale,
@@ -254,7 +268,7 @@ export const drawCampusBuildings = (
     }
   }
 
-  drawStreetBuildings(ctx, playerWorldY, 'LEFT');
+  drawStreetBuildings(ctx, playerWorldY, 'LEFT', layer);
 
   ctx.restore();
 };
