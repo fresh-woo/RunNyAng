@@ -1,0 +1,36 @@
+.rulebook {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 12px;
+  padding: 16px;
+  background: #151422;
+  color: #fff4db;
+}
+
+.rulebook-media { min-height: 0; overflow: auto; touch-action: pan-x pan-y; scrollbar-color: #a77a40 #242034; }
+.rulebook-media img { display: block; width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; }
+.rulebook-actions { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.rulebook-mobile-hint { display: none; font-size: 0.8rem; color: #e4c68f; }
+.rulebook-actions button {
+  min-height: 44px;
+  padding: 10px 24px;
+  border: 2px solid #e4c68f;
+  background: #68482d;
+  color: #fff4db;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.rulebook-actions button:hover { background: #805a35; }
+.rulebook-actions button:active { transform: translateY(2px); }
+.rulebook-actions button:focus-visible, .rulebook-media:focus-visible { outline: 3px solid #fff4db; outline-offset: 3px; }
+
+@media (max-width: 600px) {
+  .rulebook { padding: 12px; }
+  .rulebook-media img { width: 720px; height: auto; max-width: none; }
+  .rulebook-mobile-hint { display: block; }
+}
