@@ -44,6 +44,14 @@ export const drawZoneRoad = (
   const maxRelM = 52;
   const segments: RoadSegment[] = [];
 
+  // 도로가 끝나는 먼 쪽 경계를 화면의 고정된 선에 잘라 그린다.
+  // 세그먼트가 월드 격자에 붙어 함께 흘러오므로, 자르지 않으면 맨 끝 조각(0.5m ≈ 30px)이
+  // 하나씩 툭툭 나타나 길이 생겨나는 게 눈에 보인다.
+  const ROAD_HORIZON_Y = 124;
+  ctx.beginPath();
+  ctx.rect(0, ROAD_HORIZON_Y, CANVAS_WIDTH, CANVAS_HEIGHT - ROAD_HORIZON_Y);
+  ctx.clip();
+
   const firstCell = Math.floor((playerWorldY + minRelM) / stepM);
   const lastCell = Math.ceil((playerWorldY + maxRelM) / stepM);
 
@@ -59,7 +67,7 @@ export const drawZoneRoad = (
 
     // 화면 밖 클리핑 (위/아래)
     if (Math.min(pLeft0.sy, pLeft1.sy) > CANVAS_HEIGHT + 30) continue;
-    if (Math.max(pLeft0.sy, pLeft1.sy) < 140) continue;
+    if (Math.max(pLeft0.sy, pLeft1.sy) < ROAD_HORIZON_Y) continue;
 
     const currentZone = getZoneAt(wM);
     // 경계 10m 페이드 계산
