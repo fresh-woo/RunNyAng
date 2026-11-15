@@ -50,6 +50,27 @@ export const StoryCutscene = ({ onComplete }: StoryCutsceneProps) => {
     }
   };
 
+  // ESC: 남은 컷을 모두 건너뛰고 바로 난이도 선택으로 넘어간다.
+  const skip = () => {
+    if (completedRef.current) return;
+    completedRef.current = true;
+    transitioningRef.current = true;
+    onComplete();
+  };
+  const skipRef = useRef(skip);
+  skipRef.current = skip;
+
+  useEffect(() => {
+    // 포커스가 컷씬 밖(빈 곳 클릭 등)에 있어도 ESC가 먹히도록 window에서 받는다.
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.code !== "Escape" || event.repeat) return;
+      event.preventDefault();
+      skipRef.current();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   const navigate = (direction: -1 | 1) => {
     if (transitioningRef.current || completedRef.current) return;
     const targetIndex = sceneIndex + direction;
@@ -78,17 +99,26 @@ export const StoryCutscene = ({ onComplete }: StoryCutsceneProps) => {
       aria-label="중냥이의 프롤로그"
       aria-busy={isTransitioning}
       onKeyDown={(event) => {
-        if (event.code !== "Enter" && event.code !== "Escape") return;
+        const direction =
+          event.code === "Enter" || event.code === "ArrowRight" ? 1
+          : event.code === "ArrowLeft" || event.code === "Backspace" ? -1
+          : 0;
+        if (direction === 0) return;
         event.preventDefault();
         event.stopPropagation();
-        if (!event.repeat) navigate(event.code === "Escape" ? -1 : 1);
+        if (!event.repeat) navigate(direction);
       }}
     >
       <header className="story-heading">
         <h2>{scene.title}</h2>
-        <span aria-label={`${storyScenes.length}컷 중 ${sceneIndex + 1}컷`}>
-          {sceneIndex + 1} / {storyScenes.length}
-        </span>
+        <div className="story-heading-side">
+          <span aria-label={`${storyScenes.length}컷 중 ${sceneIndex + 1}컷`}>
+            {sceneIndex + 1} / {storyScenes.length}
+          </span>
+          <button type="button" className="story-skip" onClick={skip}>
+            건너뛰기 <kbd>ESC</kbd>
+          </button>
+        </div>
       </header>
 
       <div className="story-visual">
@@ -153,7 +183,7 @@ export const StoryCutscene = ({ onComplete }: StoryCutsceneProps) => {
             />
             이전
           </button>
-          <span className="story-key-hint">Enter 다음 · ESC 이전</span>
+          <span className="story-key-hint">Enter 다음 · ← 이전 · ESC 건너뛰기</span>
           <button
             type="button"
             onClick={() => navigate(1)}
