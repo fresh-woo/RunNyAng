@@ -1,5 +1,6 @@
 import { ROAD_LEFT, ROAD_RIGHT, STAGE_LENGTH, CAMPUS_GATE_M } from '../../../shared/config/gameConfig';
 import { StageData, StageObject, CampusZone } from './types';
+import { randomizeObstacles } from './randomizeObstacles';
 
 // 중앙대학교 서울캠퍼스 Stage 1: 흑석역 -> 중앙대 병원 앞 -> 정문 -> 310관 (총 1040m)
 // 학교 밖 거리 2개 구간 + 캠퍼스 8개 구간. 캠퍼스 구간은 정문(540m)부터 시작
@@ -78,6 +79,19 @@ export const cauCampusZones: CampusZone[] = [
 ];
 
 /**
+ * 횡단보도 위치 (흑석역 앞 / 병원 앞 거리 구간). [시작m, 끝m]
+ * 노면 그리기(drawZoneRoad.ts)와 행인 장애물 랜덤 배치가 같이 쓴다.
+ */
+export const CITY_CROSSWALKS: Array<[number, number]> = [
+  [14, 19],
+  [138, 143],
+  [266, 271],
+  [281, 286],
+  [440, 445],
+  [532, 537],
+];
+
+/**
  * 특정 미터 지점의 캠퍼스 구간(Zone) 정보 반환
  */
 export const getZoneAt = (meters: number): CampusZone => {
@@ -95,10 +109,12 @@ export const cauStage1Data: StageData = {
   startName: '흑석역 (출발)',
   finishName: '310관 (도착)',
   zones: cauCampusZones,
+  // 장애물(OBSTACLE)의 worldY/x 는 '기본 위치'다. 실제 판에서는 getStage1Objects()가
+  // 구간별 개수·종류는 그대로 두고 위치만 랜덤으로 다시 정한다 (randomizeObstacles.ts).
   objects: [
     // ----------------------------------------------------
     // [구간 1: 0m ~ 270m] 흑석역 앞 (0_270.png)
-    // 행인은 횡단보도(drawZoneRoad.ts 의 CITY_CROSSWALKS) 위에만 둔다
+    // 행인은 횡단보도(CITY_CROSSWALKS) 위에만 둔다
     // ----------------------------------------------------
     { id: 'lm_heukseok', name: '🚇 흑석역', worldY: 6, x: ROAD_LEFT - 30, width: 85, height: 45, type: 'LANDMARK' },
     { id: 'item_s1_1', name: '츄르', worldY: 20, x: 430, width: 24, height: 24, type: 'ITEM', subType: 'CHURU' },
@@ -210,7 +226,12 @@ export const cauStage1Data: StageData = {
   ],
 };
 
+/**
+ * 한 판에 쓸 오브젝트 목록 (깊은 복사).
+ * 장애물은 매번 구간별 개수를 지킨 채 위치가 랜덤으로 바뀐다.
+ */
 export const getStage1Objects = (): StageObject[] => {
-  return JSON.parse(JSON.stringify(cauStage1Data.objects));
+  const objects: StageObject[] = JSON.parse(JSON.stringify(cauStage1Data.objects));
+  return randomizeObstacles(objects, cauCampusZones, CITY_CROSSWALKS);
 };
 
