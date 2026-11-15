@@ -31,8 +31,9 @@ ALLOWED_ORIGINS = [
 ]
 
 NICKNAME_MIN, NICKNAME_MAX = 1, 12
-# Stage is 500 m and the top speed is 8 m/s (62.5 s); keep some slack for future tuning.
-MIN_TIME_SECONDS = float(os.environ.get("MIN_TIME_SECONDS", "30"))
+# Stage is 1040 m (Heukseok Station -> building 310) and the top speed is 8 m/s (130 s);
+# keep some slack for future tuning.
+MIN_TIME_SECONDS = float(os.environ.get("MIN_TIME_SECONDS", "90"))
 MAX_TIME_SECONDS = float(os.environ.get("MAX_TIME_SECONDS", "3600"))
 MAX_CHURU = int(os.environ.get("MAX_CHURU", "200"))
 SUBMIT_COOLDOWN_SECONDS = float(os.environ.get("SUBMIT_COOLDOWN_SECONDS", "3"))

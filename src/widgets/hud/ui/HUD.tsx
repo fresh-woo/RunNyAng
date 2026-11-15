@@ -23,7 +23,7 @@ export const HUD: React.FC<HUDProps> = ({ scoreData, gameState, onTogglePause })
   return (
     <header className="widget-hud">
       <div className="hud-top-row">
-        <div className="hud-stage-title">📍 {scoreData.currentZoneLabel || '중앙대 정문 ➔ 310관'}</div>
+        <div className="hud-stage-title">📍 {scoreData.currentZoneLabel || '흑석역 ➔ 310관'}</div>
         <div className="hud-status-group">
           <div className="hud-timer">⏱️ {formattedTime}</div>
           <div className="hud-coins">
@@ -52,7 +52,7 @@ export const HUD: React.FC<HUDProps> = ({ scoreData, gameState, onTogglePause })
       {(gameState === 'PLAYING' || isPaused) && (
       <div className="hud-progress-container">
         <div className="hud-progress-labels">
-          <span>정문</span>
+          <span>흑석역</span>
           <span>{scoreData.distance}m / {scoreData.maxDistance}m ({scoreData.progressPercent}%)</span>
           <span>310관</span>
         </div>

@@ -23,8 +23,9 @@ import {
 import { loadGameAssets, GameAssets } from '../../../shared/lib/assetLoader';
 import { createEventSystemState, updateGameEvents } from '../../game-events';
 
-const STORAGE_KEY_BEST_TIME = 'runnyang_cau_best_time';
-const STORAGE_KEY_HIGHSCORE = 'runnyang_cau_highscore';
+// 맵이 500m -> 1040m(흑석역 출발)로 바뀌어서 예전 기록과 섞이지 않도록 키를 새로 씀
+const STORAGE_KEY_BEST_TIME = 'runnyang_cau_best_time_1040m';
+const STORAGE_KEY_HIGHSCORE = 'runnyang_cau_highscore_1040m';
 
 const getStoredBestTime = (): number | null => {
   const val = localStorage.getItem(STORAGE_KEY_BEST_TIME);
