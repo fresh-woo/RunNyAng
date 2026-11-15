@@ -1,43 +1,32 @@
-import React from 'react';
-import { Overlay } from '../../../shared/ui/Overlay/Overlay';
+import { useEffect, useRef } from 'react';
 import { Button } from '../../../shared/ui/Button/Button';
 import { ScoreData } from '../../../shared/types';
-import catHurtUrl from '../../../assets/images/cat/cat_hurt.png';
+import gameOverUrl from '../../../assets/images/difficulty/game_over.png';
+import './GameOverModal.css';
 
 interface GameOverModalProps {
   scoreData: ScoreData;
   onRetry: () => void;
+  onReturnToStart: () => void;
 }
 
-export const GameOverModal: React.FC<GameOverModalProps> = ({ scoreData, onRetry }) => {
+export const GameOverModal = ({ scoreData, onRetry, onReturnToStart }: GameOverModalProps) => {
+  const sectionRef = useRef<HTMLElement>(null);
+  useEffect(() => { sectionRef.current?.focus(); }, []);
   return (
-    <Overlay>
-      <img
-        src={catHurtUrl}
-        alt="아파하는 냥이"
-        style={{
-          height: '100px',
-          width: 'auto',
-          marginBottom: '10px',
-          imageRendering: 'pixelated',
-          filter: 'drop-shadow(0 4px 10px rgba(0,0,0,0.5))',
-        }}
-        draggable={false}
-      />
-      <h2 style={{ fontSize: '2rem', color: '#f87171', marginBottom: '12px' }}>앗, 넘어졌습니다!</h2>
-      <p style={{ color: '#94a3b8', fontSize: '0.95rem', marginBottom: '16px' }}>
-        장애물에 걸려 310관까지 가지 못했습니다.
-      </p>
-
-      <div style={{ marginBottom: '24px', display: 'flex', flexDirection: 'column', gap: '8px', background: 'rgba(30, 41, 59, 0.7)', padding: '16px 28px', borderRadius: '12px' }}>
-        <p style={{ fontSize: '1.1rem' }}>달성 진척도: <strong>{scoreData.progressPercent}%</strong> ({scoreData.distance}m)</p>
-        <p style={{ fontSize: '1.05rem', color: '#facc15' }}>수집한 츄르: <strong>{scoreData.coins}개</strong></p>
+    <section ref={sectionRef} tabIndex={-1} className="game-over-screen" aria-label="하드코어 도전 실패">
+      <div className="game-over-art">
+        <img src={gameOverUrl} alt="GAME OVER. 310관 앞에서 눈물을 흘리는 중냥이" draggable={false} />
       </div>
-
-      <Button variant="retry" onClick={onRetry}>
-        정문에서 다시 달리기
-      </Button>
-    </Overlay>
+      <div className="game-over-results">
+        <p>장애물에 부딪혔어요. 하드코어 도전 실패!</p>
+        <p>도달 거리 <strong>{scoreData.distance}m ({scoreData.progressPercent}%)</strong> · 츄르 <strong>{scoreData.coins}개</strong></p>
+        <div className="game-over-actions">
+          <Button type="button" variant="retry" onClick={onRetry}>하드코어 다시 도전</Button>
+          <Button type="button" variant="home" onClick={onReturnToStart}>처음으로 돌아가기</Button>
+        </div>
+      </div>
+    </section>
   );
 };
 

@@ -4,7 +4,7 @@ import {
   PIXELS_PER_METER,
   OBSTACLE_STUN_DURATION_MS,
 } from '../../../shared/config/gameConfig';
-import { GameState, ScoreData } from '../../../shared/types';
+import { Difficulty, GameState, ScoreData } from '../../../shared/types';
 import {
   createInitialPlayer,
   updatePlayerMovement,
@@ -36,6 +36,7 @@ const getStoredBestTime = (): number | null => {
 export const useGameEngine = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [gameState, setGameState] = useState<GameState>('READY');
+  const [difficulty, setDifficulty] = useState<Difficulty>('NORMAL');
   const [scoreData, setScoreData] = useState<ScoreData>(() => ({
     distance: 0,
     maxDistance: STAGE_LENGTH,
@@ -57,6 +58,7 @@ export const useGameEngine = () => {
 
   const engineStateRef = useRef({
     state: 'READY' as GameState,
+    difficulty: 'NORMAL' as Difficulty,
     player: createInitialPlayer(),
     objects: getStage1Objects() as StageObject[],
     coinsCollected: 0,
@@ -110,8 +112,10 @@ export const useGameEngine = () => {
 
   const startOrRestartGame = useCallback(() => {
     pauseStartTimeRef.current = 0;
+    inputRef.current = { moveLeft: false, moveRight: false, moveUp: false, moveDown: false };
     engineStateRef.current = {
       state: 'PLAYING',
+      difficulty: engineStateRef.current.difficulty,
       player: createInitialPlayer(),
       objects: getStage1Objects(),
       coinsCollected: 0,
@@ -138,8 +142,16 @@ export const useGameEngine = () => {
     setGameState('INTRO');
   }, []);
 
-  const showRulebook = useCallback(() => {
+  const showDifficultySelection = useCallback(() => {
     if (engineStateRef.current.state !== 'INTRO') return;
+    engineStateRef.current.state = 'DIFFICULTY';
+    setGameState('DIFFICULTY');
+  }, []);
+
+  const selectDifficulty = useCallback((selected: Difficulty) => {
+    if (engineStateRef.current.state !== 'DIFFICULTY') return;
+    engineStateRef.current.difficulty = selected;
+    setDifficulty(selected);
     engineStateRef.current.state = 'RULEBOOK';
     setGameState('RULEBOOK');
   }, []);
@@ -154,6 +166,7 @@ export const useGameEngine = () => {
     };
     engineStateRef.current = {
       state: 'READY',
+      difficulty: 'NORMAL',
       player: createInitialPlayer(),
       objects: getStage1Objects(),
       coinsCollected: 0,
@@ -162,6 +175,7 @@ export const useGameEngine = () => {
       events: createEventSystemState(),
     };
     setGameState('READY');
+    setDifficulty('NORMAL');
     setEventMessage(null);
     setScoreData((prev) => ({
       ...prev,
@@ -226,6 +240,12 @@ export const useGameEngine = () => {
                 : rectsOverlap(playerBox, getObjectHitbox(obj, g.player.worldY));
             if (hit) {
               if (obj.type === 'OBSTACLE') {
+                if (g.difficulty === 'HARDCORE') {
+                  g.state = 'GAMEOVER';
+                  setGameState('GAMEOVER');
+                  setEventMessage(null);
+                  break;
+                }
                 // 타임어택 모드: 목숨 소진/게임오버 대신 '경직/감속 페널티' 부여
                 obj.collected = true; // 1회 피격 후 통과 처리
                 g.player.stunTimerMs = OBSTACLE_STUN_DURATION_MS;
@@ -289,11 +309,13 @@ export const useGameEngine = () => {
   return {
     canvasRef,
     gameState,
+    difficulty,
     scoreData,
     eventMessage,
     startOrRestartGame,
     beginStory,
-    showRulebook,
+    showDifficultySelection,
+    selectDifficulty,
     returnToStart,
     pauseGame,
     resumeGame,

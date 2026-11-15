@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScoreData, GameState } from '../../../shared/types';
+import { ScoreData, GameState, Difficulty } from '../../../shared/types';
 import './HUD.css';
 import iconChuruUrl from '../../../assets/images/ui/icon_churu.png';
 import catPortraitUrl from '../../../assets/images/cat/cat_portrait.png';
@@ -9,10 +9,11 @@ import btnPlayUrl from '../../../assets/images/ui/btn_play.png';
 interface HUDProps {
   scoreData: ScoreData;
   gameState?: GameState;
+  difficulty?: Difficulty;
   onTogglePause?: () => void;
 }
 
-export const HUD: React.FC<HUDProps> = ({ scoreData, gameState, onTogglePause }) => {
+export const HUD: React.FC<HUDProps> = ({ scoreData, gameState, difficulty, onTogglePause }) => {
   const minutes = Math.floor(scoreData.elapsedSeconds / 60);
   const remainingSeconds = (scoreData.elapsedSeconds % 60).toFixed(1);
   const formattedTime = `${String(minutes).padStart(2, '0')}:${remainingSeconds.padStart(4, '0')}`;
@@ -23,7 +24,7 @@ export const HUD: React.FC<HUDProps> = ({ scoreData, gameState, onTogglePause })
   return (
     <header className="widget-hud">
       <div className="hud-top-row">
-        <div className="hud-stage-title">📍 {scoreData.currentZoneLabel || '중앙대 정문 ➔ 310관'}</div>
+        <div className="hud-stage-title">{difficulty === 'HARDCORE' ? '하드코어 · ' : '📍 '}{scoreData.currentZoneLabel || '중앙대 정문 ➔ 310관'}</div>
         <div className="hud-status-group">
           <div className="hud-timer">⏱️ {formattedTime}</div>
           <div className="hud-coins">

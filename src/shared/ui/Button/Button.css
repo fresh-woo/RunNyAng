@@ -60,3 +60,7 @@
   width: auto;
   display: block;
 }
+
+.btn-pixel-img image {
+  image-rendering: pixelated;
+}

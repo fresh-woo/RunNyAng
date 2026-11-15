@@ -159,7 +159,7 @@ export const StoryCutscene = ({ onComplete }: StoryCutsceneProps) => {
             onClick={() => navigate(1)}
             disabled={isTransitioning}
           >
-            {isLastScene ? "룰북 보기" : "다음 이야기"}
+            {isLastScene ? "난이도 선택" : "다음 이야기"}
             <span aria-hidden="true" className="story-next-arrow" />
           </button>
         </footer>

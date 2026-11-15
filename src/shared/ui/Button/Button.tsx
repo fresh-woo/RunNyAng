@@ -5,9 +5,10 @@ import btnRetryUrl from '../../../assets/images/ui/btn_retry.png';
 import btnPauseUrl from '../../../assets/images/ui/btn_pause.png';
 import btnPlayUrl from '../../../assets/images/ui/btn_play.png';
 import btnExitUrl from '../../../assets/images/ui/btn_exit_clean.png';
+import btnHomeUrl from '../../../assets/images/ui/btn_home.png';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'start' | 'retry' | 'pause' | 'play' | 'exit';
+  variant?: 'primary' | 'secondary' | 'start' | 'retry' | 'pause' | 'play' | 'exit' | 'home';
   children?: React.ReactNode;
 }
 
@@ -17,6 +18,7 @@ const PIXEL_BUTTON_MAP: Partial<Record<string, string>> = {
   pause: btnPauseUrl,
   play: btnPlayUrl,
   exit: btnExitUrl,
+  home: btnHomeUrl,
 };
 
 export const Button: React.FC<ButtonProps> = ({
@@ -30,12 +32,16 @@ export const Button: React.FC<ButtonProps> = ({
   if (pixelSrc) {
     return (
       <button className={`btn btn-pixel ${className}`} {...props}>
-        <img
+        {variant === 'home' ? (
+          <svg viewBox="68 96 2028 533" role="img" aria-label={String(children ?? '처음으로 돌아가기')} className="btn-pixel-img">
+            <image href={pixelSrc} width="2170" height="725" />
+          </svg>
+        ) : <img
           src={pixelSrc}
           alt={String(children ?? variant)}
           className="btn-pixel-img"
           draggable={false}
-        />
+        />}
       </button>
     );
   }

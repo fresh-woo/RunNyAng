@@ -11,17 +11,20 @@ import { MobileDPad } from '../../../widgets/mobile-dpad';
 import { EventBanner } from '../../../widgets/event-banner';
 import { StoryCutscene } from '../../../widgets/story-cutscene';
 import { Rulebook } from '../../../widgets/rulebook';
+import { DifficultySelection } from '../../../widgets/difficulty-selection';
 import './GamePage.css';
 
 export const GamePage: React.FC = () => {
   const {
     canvasRef,
     gameState,
+    difficulty,
     scoreData,
     eventMessage,
     startOrRestartGame,
     beginStory,
-    showRulebook,
+    showDifficultySelection,
+    selectDifficulty,
     returnToStart,
     resumeGame,
     togglePause,
@@ -53,8 +56,9 @@ export const GamePage: React.FC = () => {
   return (
     <main className="game-page-container">
       <div className="game-frame">
-        {gameState !== 'INTRO' && gameState !== 'RULEBOOK' && <HUD
+        {gameState !== 'INTRO' && gameState !== 'DIFFICULTY' && gameState !== 'RULEBOOK' && gameState !== 'GAMEOVER' && <HUD
           scoreData={scoreData}
+          difficulty={difficulty}
           gameState={gameState}
           onTogglePause={togglePause}
         />}
@@ -72,7 +76,9 @@ export const GamePage: React.FC = () => {
 
         {gameState === 'READY' && <ReadyOverlay onStart={beginStory} />}
 
-        {gameState === 'INTRO' && <StoryCutscene onComplete={showRulebook} />}
+        {gameState === 'INTRO' && <StoryCutscene onComplete={showDifficultySelection} />}
+
+        {gameState === 'DIFFICULTY' && <DifficultySelection onSelect={selectDifficulty} />}
 
         {gameState === 'RULEBOOK' && <Rulebook onStart={startOrRestartGame} />}
 
@@ -81,11 +87,11 @@ export const GamePage: React.FC = () => {
         )}
 
         {gameState === 'GAMEOVER' && (
-          <GameOverModal scoreData={scoreData} onRetry={startOrRestartGame} />
+          <GameOverModal scoreData={scoreData} onRetry={startOrRestartGame} onReturnToStart={returnToStart} />
         )}
 
         {gameState === 'CLEAR' && (
-          <StageClearModal scoreData={scoreData} onRetry={startOrRestartGame} />
+          <StageClearModal scoreData={scoreData} onRetry={startOrRestartGame} onReturnToStart={returnToStart} />
         )}
 
         {/* 모바일 D-PAD 가상 방향키 (인게임 플레이 중에만 표시) */}

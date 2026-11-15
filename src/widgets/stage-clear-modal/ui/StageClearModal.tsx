@@ -9,9 +9,10 @@ import catEatUrl from '../../../assets/images/cat/cat_eat.png';
 interface StageClearModalProps {
   scoreData: ScoreData;
   onRetry: () => void;
+  onReturnToStart: () => void;
 }
 
-export const StageClearModal: React.FC<StageClearModalProps> = ({ scoreData, onRetry }) => {
+export const StageClearModal: React.FC<StageClearModalProps> = ({ scoreData, onRetry, onReturnToStart }) => {
   const [showRanking, setShowRanking] = useState(false);
   const [myNickname, setMyNickname] = useState<string | undefined>(undefined);
 
@@ -68,9 +69,12 @@ export const StageClearModal: React.FC<StageClearModalProps> = ({ scoreData, onR
         }}
       />
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-        <Button variant="retry" onClick={onRetry}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', gap: '16px' }}>
+        <Button type="button" variant="retry" onClick={onRetry}>
           다시 달리기
+        </Button>
+        <Button type="button" variant="home" onClick={onReturnToStart}>
+          처음으로 돌아가기
         </Button>
         <Button variant="secondary" onClick={() => setShowRanking(true)}>
           🏆 랭킹 보기
