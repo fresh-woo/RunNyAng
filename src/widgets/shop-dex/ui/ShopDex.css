@@ -1,0 +1,72 @@
+.shop-dex-open { position: absolute; top: 50%; right: 24px; width: 148px; transform: translateY(-50%); padding: 0; border: 0; background: transparent; cursor: pointer; touch-action: manipulation; }
+.shop-dex-open svg { display: block; width: 100%; height: auto; }
+.shop-dex-open image, .dex-device-skin image { image-rendering: pixelated; }
+.shop-dex-open:hover { filter: brightness(1.1); }
+.shop-dex-open:active { transform: translateY(-50%) scale(0.97); }
+.shop-dex-backdrop { position: absolute; inset: 0; z-index: 30; display: flex; justify-content: center; align-items: center; padding: 16px; background: rgba(2, 6, 23, 0.88); }
+.shop-dex { width: min(950px, 100%); max-height: 100%; overflow: auto; color: #efffff; scrollbar-color: #c44a57 #211525; }
+.shop-dex-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 12px; padding: 0 8px; }
+.shop-dex-header h2 { font-size: 1.5rem; }
+.shop-dex-header p { margin-top: 4px; font-size: 0.85rem; color: #d0e8e8; }
+.shop-dex button { cursor: pointer; touch-action: manipulation; font: inherit; }
+.shop-dex-header > button { flex-shrink: 0; padding: 10px 14px; border: 2px solid #a8d4b4; background: #345547; color: #effff3; }
+.dex-key { font-size: 0.7rem; display: block; margin-top: 3px; }
+.dex-device { position: relative; width: 100%; aspect-ratio: 687 / 511; }
+.dex-device-skin { position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; }
+.dex-detail, .dex-catalog { position: absolute; display: flex; flex-direction: column; min-height: 0; color: #172e38; }
+.dex-detail { left: 14.5%; top: 5.5%; width: 33%; height: 88%; overflow-y: auto; background: #e7f4f0; border: 3px solid #172535; scrollbar-color: #7b9c9c #d7e8e4; }
+.dex-detail h3 { padding: 10px 8px; min-height: 50px; background: #242a3c; color: #f4ffff; font-size: 0.9rem; overflow-wrap: anywhere; }
+.dex-photo { margin: 10px 10px 0; border: 2px dashed #6e959d; background: #d1e8e9; }
+.dex-photo canvas { display: block; width: 100%; height: auto; image-rendering: pixelated; }
+.dex-clues { padding: 10px; font-size: 0.78rem; line-height: 1.6; }
+.dex-clues p > span { font-weight: 800; margin-right: 5px; }
+.dex-extra-clue { color: #315c63; }
+.dex-letter-slots { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 8px; }
+.dex-letter-slots > span { display: inline-grid; place-items: center; min-width: 20px; height: 27px; padding: 0 3px; background: #f9ffff; border: 1px solid #7c9da1; font-weight: 800; }
+.dex-answer-form { display: grid; gap: 8px; margin-top: 10px; }
+.dex-answer-inputs { display: flex; gap: 5px; }
+.dex-answer-inputs label { min-width: 0; display: flex; flex: 1; align-items: center; gap: 5px; }
+.dex-answer-inputs input { width: 100%; min-width: 0; height: 38px; padding: 6px; border: 2px solid #6c8e93; border-radius: 0; background: #fff; color: #172e38; font: inherit; font-size: 16px; user-select: text; -webkit-user-select: text; caret-color: #9e153a; }
+.dex-answer-inputs input::placeholder { color: #526d74; }
+.dex-provided-symbol { font-size: 1rem; font-weight: 800; }
+.dex-answer-form button { min-height: 38px; padding: 6px; border: 2px solid #245044; background: #b1e7bc; color: #153b31; font-weight: 800; }
+.dex-answer-form button:hover { background: #c8f6d2; }
+.dex-registered { margin-top: 10px; font-weight: 800; color: #13513d; }
+.dex-feedback { margin-top: 8px; min-height: 1.6em; color: #813047; overflow-wrap: anywhere; }
+.dex-catalog { left: 58.3%; top: 6%; width: 38%; height: 86.7%; padding: 10px; background: #d4e6e7; border: 3px solid #172535; }
+.dex-catalog > header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 6px; padding-bottom: 8px; }
+.dex-catalog h3 { font-size: 1rem; }
+.dex-catalog header > span { font-size: 0.8rem; font-weight: 800; }
+.dex-catalog progress { width: 100%; height: 10px; margin-bottom: 10px; accent-color: #1f765b; }
+.dex-entry-list { overflow-y: auto; flex: 1; min-height: 0; scrollbar-color: #638b91 #e5f2f3; }
+.dex-entry-list button { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 56px; padding: 8px 6px; text-align: left; border: 0; border-bottom: 1px solid #8ca9ad; background: transparent; color: #203c44; }
+.dex-entry-list button:hover { background: #e8f9f5; }
+.dex-entry-list button.is-selected { background: #b2dfd3; box-shadow: inset 3px 0 #2b6653; }
+.dex-entry-list strong { display: block; font-size: 0.83rem; overflow-wrap: anywhere; }
+.dex-entry-list small { display: block; margin-top: 3px; font-size: 0.7rem; color: #36575e; }
+.dex-entry-mark { flex-shrink: 0; display: grid; place-items: center; width: 28px; height: 28px; background: #70848e; color: #fff; font-weight: 800; border: 2px solid #465c67; }
+.dex-entry-mark.is-registered { background: #1e6950; }
+.dex-save-note { padding-top: 8px; font-size: 0.7rem; line-height: 1.5; color: #36575e; }
+.shop-dex button:focus-visible, .shop-dex input:focus-visible, .shop-dex-open:focus-visible { outline: 3px solid #f3bc4e; outline-offset: 2px; }
+.dex-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@media (max-width: 800px) {
+  .shop-dex-backdrop { padding: 10px; }
+  .shop-dex-header { align-items: flex-start; }
+  .shop-dex-header p { font-size: 0.75rem; }
+  .dex-device { aspect-ratio: auto; padding: 14px; background: #a31331; border: 4px solid #370c24; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
+  .dex-device-skin { display: none; }
+  .dex-detail, .dex-catalog { position: static; width: auto; height: auto; }
+  .dex-catalog { max-height: 570px; }
+}
+@media (max-width: 520px) {
+  .shop-dex-open { top: 76px; right: 12px; width: 110px; transform: none; }
+  .shop-dex-open:active { transform: scale(0.97); }
+  .dex-device { grid-template-columns: 1fr; }
+  .dex-detail { overflow: visible; }
+  .dex-photo { align-self: center; width: min(220px, calc(100% - 20px)); }
+  .dex-clues { font-size: 0.9rem; }
+  .dex-catalog { height: 330px; }
+  .shop-dex-header h2 { font-size: 1.2rem; }
+  .shop-dex-header > button { padding: 8px 10px; }
+  .dex-entry-list button { min-height: 60px; }
+}
