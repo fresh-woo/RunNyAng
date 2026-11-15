@@ -1,4 +1,4 @@
-import { ROAD_LEFT, ROAD_RIGHT } from '../../../shared/config/gameConfig';
+import { ROAD_LEFT, ROAD_RIGHT, CAMPUS_GATE_M } from '../../../shared/config/gameConfig';
 import { StageObject } from '../../../entities/stage';
 import { Player } from '../../../entities/player';
 import {
@@ -12,6 +12,7 @@ import {
   CONSTRUCTION,
   ACT_FILMING,
   SCHOOL_BUS,
+  STREET_SAFE_EVENTS,
 } from './eventConfig';
 
 /** 이벤트로 생성된 장애물 (런타임 이동/정리를 위한 메타 포함) */
@@ -201,7 +202,12 @@ export const updateGameEvents = (
   if (s.rollTimerMs >= EVENT_TUNING.rollIntervalMs) {
     s.rollTimerMs = 0;
     if (inEventRange && s.cooldownMs === 0 && Math.random() < EVENT_TUNING.chancePerRoll) {
-      triggerEvent(pickWeighted(GAME_EVENTS), s, player, objects);
+      // 학교 밖 거리 구간에서는 사람이 횡단보도에만 나오도록, 사람이 나오는 이벤트는 빼고 공사만
+      const pool =
+        player.worldY < CAMPUS_GATE_M
+          ? GAME_EVENTS.filter((d) => STREET_SAFE_EVENTS.includes(d.id))
+          : GAME_EVENTS;
+      if (pool.length > 0) triggerEvent(pickWeighted(pool), s, player, objects);
     }
   }
 

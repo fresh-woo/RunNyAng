@@ -1,3 +1,5 @@
+import { STAGE_LENGTH } from '../../../shared/config/gameConfig';
+
 // 랜덤 이벤트 튜닝 상수 모음 (확률/빈도/크기를 여기서만 조정하면 됨)
 
 export type GameEventId = 'ETA_CROWD' | 'INTERVIEWER' | 'CONSTRUCTION' | 'ACT_FILMING' | 'SCHOOL_BUS';
@@ -17,6 +19,9 @@ export const GAME_EVENTS: GameEventDef[] = [
   { id: 'SCHOOL_BUS', message: '동작01로 등교하는 사람들이 보인다!', weight: 1 },
 ];
 
+/** 학교 밖 거리 구간(0 ~ 540m)에서도 나올 수 있는 이벤트 (사람이 나오지 않는 것만) */
+export const STREET_SAFE_EVENTS: GameEventId[] = ['CONSTRUCTION'];
+
 export const EVENT_TUNING = {
   /** 이벤트 발생 여부를 굴리는 주기 (ms) */
   rollIntervalMs: 1000,
@@ -26,7 +31,7 @@ export const EVENT_TUNING = {
   minGapMs: 5000,
   /** 이 거리(m) 이전/이후에는 이벤트가 발생하지 않음 */
   minWorldY: 15,
-  maxWorldY: 465,
+  maxWorldY: STAGE_LENGTH - 35,
   /** 화면 상단 이벤트 문구 표시 시간 (ms) */
   bannerDurationMs: 2500,
   /** 이벤트 장애물이 플레이어 앞 몇 m 지점에 나타나는지 */
