@@ -578,3 +578,30 @@ export const drawStreetBuildings = (
 
   ctx.restore();
 };
+
+/** 도감에서도 게임과 같은 건물 외벽·창문·간판을 사용한다. 미등록 이름은 가린다. */
+export const drawStreetBuildingPreview = (
+  ctx: CanvasRenderingContext2D,
+  building: StreetBuilding,
+  revealed: boolean
+): void => {
+  ctx.clearRect(0, 0, 320, 240);
+  ctx.save();
+  ctx.imageSmoothingEnabled = false;
+  ctx.beginPath();
+  ctx.rect(16, 16, 288, 208);
+  ctx.clip();
+  const seed = hashSeed(building);
+  const preview = { ...building, name: revealed ? building.name : building.name?.replace(/[^&]/gu, '?') };
+  const scale = building.kind === 'HOSPITAL' ? 0.3 : 0.6;
+  const face: Face = {
+    innerX: 20,
+    baseY: 220,
+    height: building.kind === 'HOSPITAL' ? 204 : Math.min(180, heightFor(building, seed) * scale),
+    dir: 1,
+    scale,
+  };
+  if (building.kind === 'HOSPITAL') drawHospital(ctx, preview, face);
+  else drawShop(ctx, preview, face, seed);
+  ctx.restore();
+};
