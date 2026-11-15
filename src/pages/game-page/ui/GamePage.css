@@ -38,3 +38,10 @@
   z-index: 5;
   pointer-events: none;
 }
+
+/* 터치 기기에서는 키보드 조작법 안내를 숨긴다 (D-PAD와 겹침) */
+@media (pointer: coarse) {
+  .controls-hint-bar {
+    display: none;
+  }
+}
